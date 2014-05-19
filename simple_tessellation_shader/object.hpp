@@ -23,9 +23,9 @@ class Object {
 		nv::vec3<float> my_cross(nv::vec3<float> const&, nv::vec3<float> const&) const;
 
 	private:
-		std::vector<nv::vec4<float>> _vertices;
+		std::vector<float> _vertices;
 		std::vector<nv::vec3<float>> _normals;
-		std::vector<GLushort>  _elements;
+		std::vector<int>  _elements;
 
 		//vertex array object
 		GLuint _vao;

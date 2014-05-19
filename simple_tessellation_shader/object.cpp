@@ -45,13 +45,37 @@ void Object::initGL() {
 	glGenVertexArrays(1, &_vao);
 	glBindVertexArray(_vao);
 
+	int* faces = new int[_elements.size()];
+	float* verts = new float[_vertices.size()];
+
+	std::ofstream objFile;
+	objFile.open("obj_file_formatted.txt");
+
+	for(int i = 0; i < _elements.size(); ++i){
+		if(i % 3 == 0 && i != 0)
+			objFile << "\n";
+		objFile << _elements[i] << ", ";
+		faces[i] = _elements[i];
+	}
+	for(int i = 0; i < _vertices.size(); ++i){
+		if(i % 3 == 0 && i != 0)
+			objFile << "\n";
+		objFile << _vertices[i] << "f, ";
+		verts[i] = _vertices[i];
+	}
+
+	objFile.close();
+
+
+	//std::cout << "faces count (array): " << sizeof(faces) / sizeof(faces[0]) << std::endl;
+
 	//create VBO for positions
 	glGenBuffers(1, &_VBOvertices);
 	glBindBuffer(GL_ARRAY_BUFFER, _VBOvertices);
-	glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(nv::vec4<float>), _vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(_vertices), verts, GL_STATIC_DRAW);
 		
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 
 	//create VBO for normals
 	/*glGenBuffers(1, &_VBOnormals);
@@ -64,9 +88,11 @@ void Object::initGL() {
 	//create VBO for indices
 	glGenBuffers(1, &_VBOindices);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _VBOindices);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(_elements), &_elements[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(_elements), faces, GL_STATIC_DRAW);
 	int size;  glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-	_indexCount = size/sizeof(GLushort);
+	//_indexCount = size/sizeof(GLuint);
+	_indexCount = _elements.size();
+	std::cout << "\nindex count: " << _indexCount << "\n\n";
 
 	glBindVertexArray(0); //unbind vertex array
 	
@@ -97,8 +123,16 @@ bool Object::loadOBJ(const char* filename) {
 	while (std::getline(in, line)) {
 		if (line.substr(0,2) == "v ") {
 			std::istringstream s(line.substr(2));
-			nv::vec4<float> v; s >> v.x; s >> v.y; s >> v.z; v.w = 1.0f;
-			_vertices.push_back(v);
+
+			_vertices.push_back(float());
+			s >> _vertices.back();
+			
+			_vertices.push_back(float());
+			s >> _vertices.back();
+			
+			_vertices.push_back(float());
+			s >> _vertices.back();
+			
 		}  else if (line.substr(0,2) == "f ") {
 			std::istringstream s(line.substr(2));
 			std::string fixedLine = "";
@@ -124,16 +158,16 @@ bool Object::loadOBJ(const char* filename) {
 		else { /* ignoring this line */ }
 	}
  
-	_normals.resize(_vertices.size(), nv::vec3<float>(0.0, 0.0, 0.0));
+	//_normals.resize(_vertices.size(), nv::vec3<float>(0.0, 0.0, 0.0));
 	for (unsigned i = 0; i < _elements.size(); i+=3) { 
 	//at the moment normals are not being read, but calculated
-		GLushort ia = _elements[i];
+		/*GLushort ia = _elements[i];
 		GLushort ib = _elements[i+1];
 		GLushort ic = _elements[i+2];
 		nv::vec3<float> lhs = nv::vec3<float>(_vertices[ib]) - nv::vec3<float>(_vertices[ia]);
 		nv::vec3<float> rhs = nv::vec3<float>(_vertices[ic]) - nv::vec3<float>(_vertices[ia]);
 		nv::vec3<float> normal = nv::normalize(my_cross(lhs,rhs));
-		_normals[ia] = _normals[ib] = _normals[ic] = normal;
+		_normals[ia] = _normals[ib] = _normals[ic] = normal;*/
 	}
 
 return true;

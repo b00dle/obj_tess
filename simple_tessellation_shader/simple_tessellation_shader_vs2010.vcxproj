@@ -108,12 +108,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="cylinder.hpp" />
     <ClInclude Include="object.hpp" />
     <ClInclude Include="icosahedron.hpp" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="uniforms.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="cylinder.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="icosahedron.cpp" />
     <ClCompile Include="Shader.cpp" />

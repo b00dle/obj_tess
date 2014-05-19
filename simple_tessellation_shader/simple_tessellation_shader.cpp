@@ -5,6 +5,7 @@
 #include "sdk_swak.h"
 #include "icosahedron.hpp"
 #include "object.hpp"
+#include "cylinder.hpp"
 #include "Shader.h"
 #include "GL/glew.h"
 
@@ -202,7 +203,8 @@ int main( int argc, char **argv)
 	printf("Max supported patch vertices %d\n", MaxPatchVertices);
 
 	Icosahedron ico;
-	Object obj("../model/obj/monkey.obj"); //suzanne is currently being loaded
+	Cylinder cyl;
+	Object obj("../model/obj/cylinder.obj"); //suzanne is currently being loaded
 
 	float angle = 0.0f;
 	while (running)
@@ -276,10 +278,12 @@ int main( int argc, char **argv)
 
 		//draw icosahedron
 		glPatchParameteri(GL_PATCH_VERTICES, 3);
-		glBindVertexArray(obj.getVAO());
+		//glBindVertexArray(obj.getVAO());
+		glBindVertexArray(cyl.getVAO());
 		
-		glDrawElements(GL_PATCHES, obj.getIndexCount(), GL_UNSIGNED_SHORT, 0); //for general obj
-		//glDrawElements(GL_PATCHES, ico.getIndexCount(), GL_UNSIGNED_INT, 0);
+		//glDrawElements(GL_TRIANGLES, obj.getIndexCount(), GL_UNSIGNED_INT, 0); //for general obj
+		//glDrawElements(GL_PATCHES, obj.getIndexCount(), GL_UNSIGNED_INT, 0); //for general obj
+		glDrawElements(GL_PATCHES, ico.getIndexCount(), GL_UNSIGNED_INT, 0);
 		
 		glBindVertexArray(0);
 		glUseProgram(0);

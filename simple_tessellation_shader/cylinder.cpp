@@ -1,7 +1,7 @@
-#include "icosahedron.hpp"
+#include "cylinder.hpp"
 #include <iostream>
 
-Icosahedron::Icosahedron():
+Cylinder::Cylinder():
 	_faces			(),
 	_verts			(),
 	_vao			(0),
@@ -15,58 +15,62 @@ Icosahedron::Icosahedron():
 	init();
 }
 
-Icosahedron::~Icosahedron()
+Cylinder::~Cylinder()
 {}
 
-void Icosahedron::init() {
+void Cylinder::init() {
 	const float verts[] = {
-         0.000f,  0.000f,  1.000f,
-         0.894f,  0.000f,  0.447f,
-         0.276f,  0.851f,  0.447f,
+        -0.763401f, -0.800936f, 0.763401f, 
+		0.763401f, -0.800936f, 0.763401f, 
+		-0.763401f, -0.800936f, -0.763401f,
 
-        -0.724f,  0.526f,  0.447f,
-        -0.724f, -0.526f,  0.447f,
-         0.276f, -0.851f,  0.447f,
-         
-		 0.724f,  0.526f, -0.447f,
-        -0.276f,  0.851f, -0.447f,
-        -0.894f,  0.000f, -0.447f,
-        
-		-0.276f, -0.851f, -0.447f,
-         0.724f, -0.526f, -0.447f,
-         0.000f,  0.000f, -1.000f 
+		0.763401f, -0.800936f, -0.763401f, 
+		-1.01532f, -0.800936f, 0.0f, 
+		0.0f, -0.800936f, 1.01532f, 
+		
+		1.01532f, -0.800936f, 0.0f, 
+		0.0f, -0.800936f, -1.01532f, 
+		-0.763401f, 0.725866f, 0.763401f, 
+		
+		0.763401f, 0.725866f, 0.763401f, 
+		-0.763401f, 0.725866f, -0.763401f, 
+		0.763401f, 0.725866f, -0.763401f, 
+		
+		-1.01532f, 0.725866f, 0.0f, 
+		0.0f, 0.725866f, 1.01532f, 
+		1.01532f, 0.725866f, 0.0f, 
+		
+		0.0f, 0.725866f, -1.01532f 
 	};
 
 	const int faces[] = {
-		2, 1, 0,
-		3, 2, 0,
-		4, 3, 0,
-		5, 4, 0,
-		1, 5, 0,
+		3, 7, 15, 
+		1, 6, 14, 
+		0, 5, 13, 
 		
-		11, 6,  7,
-		11, 7,  8,
-		11, 8,  9,
-		11, 9,  10,
-		11, 10, 6,
+		2, 4, 12, 
+		7, 2, 10, 
+		6, 3, 11, 
 		
-		1, 2, 6,
-		2, 3, 7,
-		3, 4, 8,
-		4, 5, 9,
-		5, 1, 10,
+		5, 1, 9, 
+		4, 0, 8, 
+		11, 3, 15, 
 		
-		2,  7, 6,
-		3,  8, 7,
-		4,  9, 8,
-		5, 10, 9,
-		1, 6, 10
+		9, 1, 14, 
+		8, 0, 13, 
+		10, 2, 12, 
+		
+		15, 7, 10, 
+		14, 6, 11, 
+		13, 5, 9,
+
+		12, 4, 8 
 	};
 	
-	for(int i = 0; i < 60; ++i){
+	for(int i = 0; i < 48; ++i){
 		_faces[i] = faces[i];
 	}
-	for(int i = 0; i < 36; ++i){
+	for(int i = 0; i < 48; ++i){
 		_verts[i] = verts[i];
 	}
 
@@ -76,7 +80,7 @@ void Icosahedron::init() {
 	_stride = 3 * sizeof(float);
 }
 
-void Icosahedron::initGL() {
+void Cylinder::initGL() {
 	//create VAO
 	glGenVertexArrays(1, &_vao);
 	glBindVertexArray(_vao);
@@ -104,12 +108,12 @@ void Icosahedron::initGL() {
 	_doneInitGL = true;
 }
 
-GLuint Icosahedron::getVAO() {
+GLuint Cylinder::getVAO() {
 	if(!_doneInitGL)
 		initGL();
 	return _vao;
 }
 
-GLsizei Icosahedron::getIndexCount() const {
+GLsizei Cylinder::getIndexCount() const {
 	return _indexCount;
 }
