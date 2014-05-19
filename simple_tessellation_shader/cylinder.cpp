@@ -4,10 +4,10 @@
 Cylinder::Cylinder():
 	_faces			(),
 	_verts			(),
+	_normals		(),
+	_texCoords		(),
 	_vao			(0),
 	_VBOpositions	(0),
-	_stride			(0),
-	_positionSlot	(0),
 	_VBOindices		(0),
 	_indexCount		(0),
 	_doneInitGL		(false)
@@ -23,61 +23,156 @@ void Cylinder::init() {
         -0.763401f, -0.800936f, 0.763401f, 
 		0.763401f, -0.800936f, 0.763401f, 
 		-0.763401f, -0.800936f, -0.763401f,
-
 		0.763401f, -0.800936f, -0.763401f, 
 		-1.01532f, -0.800936f, 0.0f, 
 		0.0f, -0.800936f, 1.01532f, 
-		
 		1.01532f, -0.800936f, 0.0f, 
 		0.0f, -0.800936f, -1.01532f, 
 		-0.763401f, 0.725866f, 0.763401f, 
-		
 		0.763401f, 0.725866f, 0.763401f, 
 		-0.763401f, 0.725866f, -0.763401f, 
 		0.763401f, 0.725866f, -0.763401f, 
-		
 		-1.01532f, 0.725866f, 0.0f, 
 		0.0f, 0.725866f, 1.01532f, 
 		1.01532f, 0.725866f, 0.0f, 
-		
 		0.0f, 0.725866f, -1.01532f 
 	};
 
 	const int faces[] = {
 		3, 7, 15, 
 		1, 6, 14, 
-		0, 5, 13, 
-		
+		0, 5, 13, 	
 		2, 4, 12, 
 		7, 2, 10, 
 		6, 3, 11, 
-		
 		5, 1, 9, 
 		4, 0, 8, 
 		11, 3, 15, 
-		
 		9, 1, 14, 
 		8, 0, 13, 
 		10, 2, 12, 
-		
 		15, 7, 10, 
 		14, 6, 11, 
 		13, 5, 9,
-
 		12, 4, 8 
 	};
-	
+
+	const float normals[] = {
+		0.313377f, 0.0f, -0.949629f, 
+		0.313377f, 0.0f, -0.949629f, 
+		0.313377f, 0.0f, -0.949629f, 
+		0.949629f, 0.0f, 0.313377f, 
+		0.949629f, 0.0f, 0.313377f, 
+		0.949629f, 0.0f, 0.313377f, 
+		-0.313377f, 0.0f, 0.949629f, 
+		-0.313377f, 0.0f, 0.949629f, 
+		-0.313377f, 0.0f, 0.949629f, 
+		-0.949629f, 0.0f, -0.313377f, 
+		-0.949629f, 0.0f, -0.313377f, 
+		-0.949629f, 0.0f, -0.313377f, 
+		-0.313378f, 0.0f, -0.949629f, 
+		-0.313378f, 0.0f, -0.949629f, 
+		-0.313378f, 0.0f, -0.949629f, 
+		0.949629f, 0.0f, -0.313377f, 
+		0.949629f, 0.0f, -0.313377f, 
+		0.949629f, 0.0f, -0.313377f, 
+		0.313378f, 0.0f, 0.949629f, 
+		0.313378f, 0.0f, 0.949629f, 
+		0.313378f, 0.0f, 0.949629f, 
+		-0.949629f, 0.0f, 0.313377f, 
+		-0.949629f, 0.0f, 0.313377f, 
+		-0.949629f, 0.0f, 0.313377f, 
+		0.313378f, 0.0f, -0.949629f, 
+		0.313378f, 0.0f, -0.949629f, 
+		0.313378f, 0.0f, -0.949629f, 
+		0.949629f, 0.0f, 0.313377f, 
+		0.949629f, 0.0f, 0.313377f, 
+		0.949629f, 0.0f, 0.313377f, 
+		-0.313378f, 0.0f, 0.949629f, 
+		-0.313378f, 0.0f, 0.949629f, 
+		-0.313378f, 0.0f, 0.949629f, 
+		-0.949629f, 0.0f, -0.313377f, 
+		-0.949629f, 0.0f, -0.313377f, 
+		-0.949629f, 0.0f, -0.313377f, 
+		-0.313377f, 0.0f, -0.949629f, 
+		-0.313377f, 0.0f, -0.949629f, 
+		-0.313377f, 0.0f, -0.949629f, 
+		0.949629f, 0.0f, -0.313377f, 
+		0.949629f, 0.0f, -0.313377f, 
+		0.949629f, 0.0f, -0.313377f, 
+		0.313377f, 0.0f, 0.949629f, 
+		0.313377f, 0.0f, 0.949629f, 
+		0.313377f, 0.0f, 0.949629f, 
+		-0.949629f, 0.0f, 0.313377f, 
+		-0.949629f, 0.0f, 0.313377f, 
+		-0.949629f, 0.0f, 0.313377f
+	};
+
+	const float texCoords[] = {
+		0.5f, 0.5f, 
+		0.222775f, 0.5f, 
+		0.222775f, 0.0f, 
+		0.0f, 0.5f, 
+		0.277225f, 0.5f, 
+		0.277225f, 1.0f, 
+		1.0f, 0.5f, 
+		0.722775f, 0.5f, 
+		0.722775f, 0.0f, 
+		0.5f, 0.5f, 
+		0.777225f, 0.5f, 
+		0.777225f, 1.0f, 
+		0.222775f, 0.5f, 
+		0.0f, 0.5f, 
+		0.0f, 0.0f, 
+		0.277225f, 0.5f, 
+		0.5f, 0.5f, 
+		0.5f, 1.0f, 
+		0.722775f, 0.5f, 
+		0.5f, 0.5f, 
+		0.5f, 0.0f, 
+		0.777225f, 0.5f, 
+		1.0f, 0.5f, 
+		1.0f, 1.0f, 
+		0.5f, 0.0f, 
+		0.5f, 0.5f, 
+		0.222775f, 0.0f, 
+		0.0f, 1.0f, 
+		0.0f, 0.5f, 
+		0.277225f, 1.0f, 
+		1.0f, 0.0f, 
+		1.0f, 0.5f, 
+		0.722775f, 0.0f, 
+		0.5f, 1.0f, 
+		0.5f, 0.5f, 
+		0.777225f, 1.0f, 
+		0.222775f, 0.0f, 
+		0.222775f, 0.5f, 
+		0.0f, 0.0f, 
+		0.277225f, 1.0f, 
+		0.277225f, 0.5f, 
+		0.5f, 1.0f, 
+		0.722775f, 0.0f, 
+		0.722775f, 0.5f, 
+		0.5f, 0.0f, 
+		0.777225f, 1.0f, 
+		0.777225f, 0.5f, 
+		1.0f, 1.0f
+	};
+
 	for(int i = 0; i < 48; ++i){
 		_faces[i] = faces[i];
 	}
 	for(int i = 0; i < 48; ++i){
 		_verts[i] = verts[i];
 	}
+	for(int i = 0; i < 144; ++i){
+		_normals[i] = normals[i];
+	}
+	for(int i = 0; i < 96; ++i){
+		_texCoords[i] = texCoords[i];
+	}
 
 	_indexCount = sizeof(_faces) / sizeof(_faces[0]);
-	std::cout << "\nindex count: " << _indexCount << "\n\n";
-
-	_stride = 3 * sizeof(float);
 }
 
 void Cylinder::initGL() {
@@ -91,7 +186,23 @@ void Cylinder::initGL() {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(_verts), _verts, GL_STATIC_DRAW);
 	
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, _stride, 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
+	//create VBO for normals
+	glGenBuffers(1, &_VBOnormals);
+	glBindBuffer(GL_ARRAY_BUFFER, _VBOnormals);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(_normals), _normals, GL_STATIC_DRAW);
+	
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
+	//create VBO for texcoords
+	glGenBuffers(1, &_VBOtexCoords);
+	glBindBuffer(GL_ARRAY_BUFFER, _VBOtexCoords);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(_texCoords), _texCoords, GL_STATIC_DRAW);
+	
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
 	
 	//create VBO for indices
 	glGenBuffers(1, &_VBOindices);

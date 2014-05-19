@@ -2,7 +2,6 @@
 
 layout(location = 0) out vec4 fragColor;
 
-in vec3 vPosition;
 in vec3 gFacetNormal;
 in vec3 gTriDistance;
 in vec3 gPatchDistance;

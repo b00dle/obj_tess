@@ -24,8 +24,6 @@ class Icosahedron {
 
 		//vbo for positions
 		GLuint _VBOpositions;
-		GLsizei _stride;
-		GLuint _positionSlot;
 
 		//vbo for indices
 		GLuint _VBOindices;
