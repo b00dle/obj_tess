@@ -182,7 +182,7 @@ void init()
 
 	//generate textures
 	glGenTextures(1, texBufferIds);
-	loadTexture(0, "../data/textures/bark_tex.jpg");
+	loadTexture(0, "../data/textures/stone.jpg");
 	glBindTexture(GL_TEXTURE_2D, 0); //safety unbind
 	
 	//uniform locations
