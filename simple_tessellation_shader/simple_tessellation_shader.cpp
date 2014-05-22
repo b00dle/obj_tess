@@ -2,16 +2,20 @@
 #include <stdio.h>
 #include <algorithm>
 #include <iostream>
+
+#include "GL/glew.h"
+#include "FreeImage.h"
+
 #include "sdk_swak.h"
 #include "icosahedron.hpp"
 #include "cylinder.hpp"
 #include "objFormatter.hpp"
 #include "Shader.h"
-#include "GL/glew.h"
 
 //shaders
 unsigned sProgram;
 unsigned shaderIds[5] = { 0u };
+unsigned texBufferIds[1] = { 0u };
 
 //uniform locations
 unsigned MVPlocation		= 0;
@@ -22,6 +26,7 @@ unsigned lodLocation		= 0;
 unsigned distanceLocation	= 0;
 unsigned lightLocation		= 0;
 unsigned litLocation		= 0;
+unsigned texLocation		= 0;
 
 // Flag to identify when the app needs to close
 bool running = true;
@@ -112,6 +117,38 @@ void mouse( nv::MouseButton::MouseButton button, bool down)
 	ui.mouse( button, int(down), x, y);
 }
 
+void loadTexture(int tID, const char* filepath) {
+	FreeImage_Initialise();
+	FIBITMAP* _bitmap;
+
+	_bitmap = FreeImage_Load(FreeImage_GetFileType(filepath, 0),
+							 filepath);
+
+	if(!_bitmap){
+		std::cout << "texture: \'" << filepath << "\' didn't load\n";
+		return;
+	}
+
+	unsigned char* pixelData = FreeImage_GetBits(_bitmap);
+
+	glEnable(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, texBufferIds[tID]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+				FreeImage_GetWidth(_bitmap),
+				FreeImage_GetHeight(_bitmap),
+				0, GL_BGR, GL_UNSIGNED_BYTE,
+				pixelData
+	);
+
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void init()
 {
 	// setup some defines for the shaders
@@ -142,6 +179,11 @@ void init()
 		glAttachShader(sProgram, shaderIds[4]);
 	}
 	glLinkProgram(sProgram);
+
+	//generate textures
+	glGenTextures(1, texBufferIds);
+	loadTexture(0, "../data/textures/bark_tex.jpg");
+	glBindTexture(GL_TEXTURE_2D, 0); //safety unbind
 	
 	//uniform locations
 	MVPlocation			= glGetUniformLocation(sProgram, "ModelViewProjection");
@@ -152,6 +194,7 @@ void init()
 	distanceLocation	= glGetUniformLocation(sProgram, "distance");
 	lightLocation		= glGetUniformLocation(sProgram, "light");
 	litLocation			= glGetUniformLocation(sProgram, "lit");
+	texLocation			= glGetUniformLocation(sProgram, "tex");
 
 	GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR) {
@@ -204,7 +247,7 @@ int main( int argc, char **argv)
 
 	Icosahedron ico;
 	Cylinder cyl;
-	//ObjFormatter obj("../model/obj/cylinder.obj");
+	//ObjFormatter obj("cylinder_right.obj");
 
 	float angle = 0.0f;
 	while (running)
@@ -279,8 +322,14 @@ int main( int argc, char **argv)
 		//draw icosahedron
 		glPatchParameteri(GL_PATCH_VERTICES, 3);
 		glBindVertexArray(cyl.getVAO());
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texBufferIds[0]);
+		glUniform1i(texLocation, 0);
 		
 		glDrawElements(GL_PATCHES, cyl.getIndexCount(), GL_UNSIGNED_INT, 0);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
 		
 		glBindVertexArray(0);
 		glUseProgram(0);
