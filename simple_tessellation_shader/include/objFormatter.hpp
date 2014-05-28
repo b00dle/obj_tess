@@ -15,8 +15,7 @@ class ObjFormatter {
 	private:
 		bool readOBJ(const char*);
 		bool writeOBJ(const char*);
-		nv::vec3<float> my_cross(nv::vec3<float> const&, nv::vec3<float> const&) const;
-
+		
 	private:
 		std::vector<float> _vertices;
 		std::vector<float> _normals;

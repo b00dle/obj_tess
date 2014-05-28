@@ -237,12 +237,3 @@ bool ObjFormatter::writeOBJ(const char* path){
 
 	return true;
 }
-
-nv::vec3<float> ObjFormatter::my_cross(nv::vec3<float> const& lhs, nv::vec3<float> const& rhs) const { 
-//implementation of cross product since cross somehow runs into bugs
-	nv::vec3<float> res(0.0f,0.0f,0.0f);
-	res[0] = lhs[1]*rhs[2]-lhs[2]*rhs[1];
-	res[1] = lhs[2]*rhs[0]-lhs[0]*rhs[2];
-	res[2] = lhs[0]*rhs[1]-lhs[1]*rhs[0];
-	return res;
-}

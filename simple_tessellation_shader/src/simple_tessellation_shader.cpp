@@ -11,6 +11,9 @@
 #include "cylinder.hpp"
 #include "objFormatter.hpp"
 #include "Shader.h"
+#include "GeneralizedCylinder.h"
+#include "Path.h"
+#include "Contour.h"
 
 //shaders
 unsigned sProgram;
@@ -245,8 +248,43 @@ int main( int argc, char **argv)
 	glGetIntegerv(GL_MAX_PATCH_VERTICES, &MaxPatchVertices);
 	printf("Max supported patch vertices %d\n", MaxPatchVertices);
 
+	//////GENERALIZED CYLINDER//////
+	
+	//path
+	nv::matrix4f start, mid, end;
+	start.make_identity();
+	end.make_identity();
+	mid.make_identity();
+	start.set_translate(nv::vec3f(0.0f,-1.0f,0.0f));
+	mid.set_translate(nv::vec3f(0.0f,0.0f,0.0f));
+	end.set_translate(nv::vec3f(0.0f,1.0f,0.0f));
+	
+	Path path;
+	path.addSegment(start);
+	path.addSegment(mid);
+	path.addSegment(end);
+	path.calculate();
+	
+	//contour
+	Contour contour;
+
+	//thickness
+	std::vector<float> thickness;
+	thickness.push_back(1.0f);
+	thickness.push_back(1.0f);
+	thickness.push_back(1.0f);
+	
+	//water
+	std::vector<float> water;
+	water.push_back(1.0f);
+	water.push_back(1.0f);
+	water.push_back(1.0f);
+
+	///////////////////////////////
+
 	Icosahedron ico;
 	Cylinder cyl;
+	GeneralizedCylinder genCyl(path, contour, thickness, water, 1);
 	//ObjFormatter obj("cylinder_right.obj");
 
 	float angle = 0.0f;
@@ -321,13 +359,13 @@ int main( int argc, char **argv)
 
 		//draw icosahedron
 		glPatchParameteri(GL_PATCH_VERTICES, 3);
-		glBindVertexArray(cyl.getVAO());
+		glBindVertexArray(genCyl.getVAO());
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texBufferIds[0]);
 		glUniform1i(texLocation, 0);
 		
-		glDrawElements(GL_PATCHES, cyl.getIndexCount(), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_PATCHES, genCyl.getIndexCount(), GL_UNSIGNED_INT, 0);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 		

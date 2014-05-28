@@ -52,7 +52,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\sdk_swak;..\glew\include;..\glut\include;..\glm;..\freeimage\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\sdk_swak;..\glew\include;..\glut\include;..\glm;..\freeimage\include;include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_CONSOLE;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -80,7 +80,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <Optimization>Full</Optimization>
-      <AdditionalIncludeDirectories>..\sdk_swak;..\glew\include;..\glut\include;..\glm;..\freeimage\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\sdk_swak;..\glew\include;..\glut\include;..\glm;..\freeimage\include;include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_CONSOLE;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
@@ -108,26 +108,35 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="cylinder.hpp" />
-    <ClInclude Include="objFormatter.hpp" />
-    <ClInclude Include="icosahedron.hpp" />
-    <ClInclude Include="Shader.h" />
-    <ClInclude Include="uniforms.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="cylinder.cpp" />
-    <ClCompile Include="objFormatter.cpp" />
-    <ClCompile Include="icosahedron.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="simple_tessellation_shader.cpp">
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="fragment.glsl" />
     <None Include="geometry.glsl" />
     <None Include="tess_control.glsl" />
     <None Include="tess_eval.glsl" />
     <None Include="vertex.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Bezierpath.cpp" />
+    <ClCompile Include="src\Contour.cpp" />
+    <ClCompile Include="src\cylinder.cpp" />
+    <ClCompile Include="src\GeneralizedCylinder.cpp" />
+    <ClCompile Include="src\icosahedron.cpp" />
+    <ClCompile Include="src\Mathlib.cpp" />
+    <ClCompile Include="src\objFormatter.cpp" />
+    <ClCompile Include="src\Path.cpp" />
+    <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\simple_tessellation_shader.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Bezierpath.h" />
+    <ClInclude Include="include\Contour.h" />
+    <ClInclude Include="include\cylinder.hpp" />
+    <ClInclude Include="include\GeneralizedCylinder.h" />
+    <ClInclude Include="include\icosahedron.hpp" />
+    <ClInclude Include="include\Mathlib.h" />
+    <ClInclude Include="include\objFormatter.hpp" />
+    <ClInclude Include="include\Path.h" />
+    <ClInclude Include="include\Shader.h" />
+    <ClInclude Include="include\uniforms.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

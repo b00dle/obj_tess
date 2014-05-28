@@ -28,7 +28,7 @@ void main(){
 								  tcPosition[2] - tcPosition[0]));
 
 	float height = texture(tex, teTexCoord).x;
-	height = 0.2*height;
+	height = height - 1.0f;
 	pos += (normal * height);
 
 	gl_Position = ModelViewProjection * vec4(pos, 1);
