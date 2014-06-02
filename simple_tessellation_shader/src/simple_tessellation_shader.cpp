@@ -5,8 +5,8 @@
 
 #include "GL/glew.h"
 #include "FreeImage.h"
-
 #include "sdk_swak.h"
+
 #include "icosahedron.hpp"
 #include "cylinder.hpp"
 #include "objFormatter.hpp"
@@ -14,6 +14,7 @@
 #include "GeneralizedCylinder.h"
 #include "Path.h"
 #include "Contour.h"
+#include "Image.h"
 
 //shaders
 unsigned sProgram;
@@ -170,22 +171,23 @@ void init()
 		//create stages
 		shaderIds[0] = Shader::loadShader("vertex.glsl", GL_VERTEX_SHADER);
 		shaderIds[1] = Shader::loadShader("fragment.glsl", GL_FRAGMENT_SHADER);
-		shaderIds[2] = Shader::loadShader("tess_control.glsl", GL_TESS_CONTROL_SHADER);
+		/*shaderIds[2] = Shader::loadShader("tess_control.glsl", GL_TESS_CONTROL_SHADER);
 		shaderIds[3] = Shader::loadShader("tess_eval.glsl", GL_TESS_EVALUATION_SHADER);
-		shaderIds[4] = Shader::loadShader("geometry.glsl", GL_GEOMETRY_SHADER);
+		shaderIds[4] = Shader::loadShader("geometry.glsl", GL_GEOMETRY_SHADER);*/
 
 		//attach stages to program
 		glAttachShader(sProgram, shaderIds[0]);
 		glAttachShader(sProgram, shaderIds[1]);
-		glAttachShader(sProgram, shaderIds[2]);
+		/*glAttachShader(sProgram, shaderIds[2]);
 		glAttachShader(sProgram, shaderIds[3]);
-		glAttachShader(sProgram, shaderIds[4]);
+		glAttachShader(sProgram, shaderIds[4]);*/
 	}
 	glLinkProgram(sProgram);
 
 	//generate textures
 	glGenTextures(1, texBufferIds);
 	loadTexture(0, "../data/textures/stone.jpg");
+	Image img("../data/textures/bark_tex.jpg");
 	glBindTexture(GL_TEXTURE_2D, 0); //safety unbind
 	
 	//uniform locations
@@ -254,14 +256,14 @@ int main( int argc, char **argv)
 	nv::matrix4f start, mid, end;
 	start.make_identity();
 	end.make_identity();
-	mid.make_identity();
+	//mid.make_identity();
 	start.set_translate(nv::vec3f(0.0f,-1.0f,0.0f));
-	mid.set_translate(nv::vec3f(0.0f,0.0f,0.0f));
+	//mid.set_translate(nv::vec3f(0.0f,0.0f,0.0f));
 	end.set_translate(nv::vec3f(0.0f,1.0f,0.0f));
 	
-	Path path;
-	path.addSegment(start);
-	path.addSegment(mid);
+	Path path(start);
+	//path.addSegment(start);
+	//path.addSegment(mid);
 	path.addSegment(end);
 	path.calculate();
 	
@@ -271,13 +273,13 @@ int main( int argc, char **argv)
 	//thickness
 	std::vector<float> thickness;
 	thickness.push_back(1.0f);
-	thickness.push_back(1.0f);
+	//thickness.push_back(1.0f);
 	thickness.push_back(1.0f);
 	
 	//water
 	std::vector<float> water;
 	water.push_back(1.0f);
-	water.push_back(1.0f);
+	//water.push_back(1.0f);
 	water.push_back(1.0f);
 
 	///////////////////////////////
@@ -358,14 +360,14 @@ int main( int argc, char **argv)
 			glUniform1f(lodLocation, 0.0f);		
 
 		//draw icosahedron
-		glPatchParameteri(GL_PATCH_VERTICES, 3);
+		//glPatchParameteri(GL_PATCH_VERTICES, 3);
 		glBindVertexArray(genCyl.getVAO());
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texBufferIds[0]);
 		glUniform1i(texLocation, 0);
 		
-		glDrawElements(GL_PATCHES, genCyl.getIndexCount(), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, genCyl.getIndexCount(), GL_UNSIGNED_INT, 0);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 		

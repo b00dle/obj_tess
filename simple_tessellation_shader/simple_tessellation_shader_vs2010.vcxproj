@@ -120,6 +120,7 @@
     <ClCompile Include="src\cylinder.cpp" />
     <ClCompile Include="src\GeneralizedCylinder.cpp" />
     <ClCompile Include="src\icosahedron.cpp" />
+    <ClCompile Include="src\Image.cpp" />
     <ClCompile Include="src\Mathlib.cpp" />
     <ClCompile Include="src\objFormatter.cpp" />
     <ClCompile Include="src\Path.cpp" />
@@ -132,6 +133,7 @@
     <ClInclude Include="include\cylinder.hpp" />
     <ClInclude Include="include\GeneralizedCylinder.h" />
     <ClInclude Include="include\icosahedron.hpp" />
+    <ClInclude Include="include\Image.h" />
     <ClInclude Include="include\Mathlib.h" />
     <ClInclude Include="include\objFormatter.hpp" />
     <ClInclude Include="include\Path.h" />
