@@ -4,32 +4,26 @@
 #include <sstream>
 #include <vector>
 #include "FreeImage.h"
-
-struct Color {
-	float r;
-	float g;
-	float b;
-	
-	std::string const print() {
-		std::ostringstream ss;
-		ss << "(" << r << " | " << g << " | " << b << ")";
-		return ss.str();
-	}
-};
+#include "sdk_swak.h"
 
 class Image {
 	public:
 		Image(const char*);
 		~Image();
+		
+		unsigned int		getWidth()			const;
+		unsigned int		getHeight()			const;
+		nv::vec3f const&	getPixel(int, int)	const;
 
-		Color const&	getPixel(int, int) const;
+		void				setPixel(int, int, nv::vec3f const&);
+		void				setPixel(int, int, float, float, float);
 
-		void			setPixel(int, int, Color const&);
-		void			setPixel(int, int, float, float, float);
+		bool				saveToFile(FREE_IMAGE_FORMAT, const char*);
 
 	private:
 		bool init();
 		bool storePixelValues();
+		bool updateBitmap();
 		
 	private:
 		const char*	_filepath;
@@ -38,8 +32,8 @@ class Image {
 		unsigned int _width;
 		unsigned int _height;
 		unsigned int _pitch;
-
-		std::vector<std::vector<Color*>> _pixelValues;
+		
+		std::vector<std::vector<nv::vec3f*>> _pixelValues;
 };
 
 #endif

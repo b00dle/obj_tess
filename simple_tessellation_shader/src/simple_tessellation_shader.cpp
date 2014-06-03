@@ -187,7 +187,23 @@ void init()
 	//generate textures
 	glGenTextures(1, texBufferIds);
 	loadTexture(0, "../data/textures/stone.jpg");
-	Image img("../data/textures/bark_tex.jpg");
+	
+	/*
+	Image img("../data/textures/stone.jpg");
+
+	unsigned int width = img.getWidth();
+	unsigned int height = img.getHeight();
+	nv::vec3f add(0.8,0.2,0.1);
+	for(unsigned int x = 0; x < 649; ++x){
+		for(unsigned int y = 0; y < 649; ++y){
+			img.setPixel(x, y, 0.5*img.getPixel(x,y) + 0.5*add);
+		}
+	}
+
+	if(img.saveToFile(FIF_JPEG, "../data/textures/stone2.jpg"))
+		std::cout << "successfully saved image\n" << std::endl; 
+	*/
+	
 	glBindTexture(GL_TEXTURE_2D, 0); //safety unbind
 	
 	//uniform locations
