@@ -21,7 +21,7 @@ GeneralizedCylinder::GeneralizedCylinder(Path const& b , Contour const& c, std::
 			
 		float dicke = getThickness(i);
 		
-		nv::matrix4f scaleMatrix = nv::matrix4f(1.0f);
+		nv::matrix4f scaleMatrix;
 
 		if(dicke >0.00001f)
 			scaleMatrix.set_scale(nv::vec3f(dicke,0.0f,dicke));

@@ -3,7 +3,7 @@
 float Mathlib::distance(nv::vec4f const& lhs, nv::vec4f const& rhs) {
 	nv::vec3f tempL(lhs);
 	nv::vec3f tempR(rhs);
-	return sqrtf(pow(tempR.x-tempL.x, 2) + pow(tempR.x-tempL.x, 2) + pow(tempR.z-tempL.z, 2));;
+	return sqrtf(pow(tempR.x-tempL.x, 2) + pow(tempR.y-tempL.y, 2) + pow(tempR.z-tempL.z, 2));;
 }
 
 float Mathlib::angle(nv::vec4f const& lhs, nv::vec4f const& rhs) {
