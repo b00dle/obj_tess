@@ -5,9 +5,11 @@ layout(location = 0) out vec4 fragColor;
 in vec3 gFacetNormal;
 in vec3 gTriDistance;
 in vec3 gPatchDistance;
+in vec2 gTexCoord;
 
 uniform float lit;
 uniform vec3 light;
+uniform sampler2D tex;
 
 float amplify(float d, float scale, float offset) {
 	d = scale * d + offset;
@@ -24,6 +26,7 @@ void main() {
 		vec3 color = gl_FrontFacing ? vec3(1.0,0.6,0.0) : vec3(0.6,0.0,1.0);
 	#endif
 	if (lit > 0.5) {
+		color = texture(tex, gTexCoord).xyz; 
 		vec3 N = normalize(gFacetNormal);
 		vec3 L = light;
 		float df = abs(dot(N,L));

@@ -27,9 +27,9 @@ void main(){
 	vec3 normal = normalize(cross(tcPosition[1] - tcPosition[0], 
 								  tcPosition[2] - tcPosition[0]));
 
-	float height = texture(tex, teTexCoord).x;
+	/*float height = texture(tex, teTexCoord).x;
 	height = height - 1.0f;
-	pos += (normal * height);
+	pos += (normal * height);*/
 
 	gl_Position = ModelViewProjection * vec4(pos, 1);
 	tePosition = vec3(ModelView * vec4(pos,1.0)).xyz;
