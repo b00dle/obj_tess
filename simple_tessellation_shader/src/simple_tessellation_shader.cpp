@@ -19,6 +19,7 @@
 //shaders
 unsigned sProgram;
 unsigned shaderIds[5] = { 0u };
+unsigned texBufferIds[1] = { 0u };
 
 //uniform locations
 unsigned MVPlocation		= 0;
@@ -29,6 +30,7 @@ unsigned lodLocation		= 0;
 unsigned distanceLocation	= 0;
 unsigned lightLocation		= 0;
 unsigned litLocation		= 0;
+unsigned texDiffuseLocation	= 0;
 unsigned texHeightLocation	= 0;
 
 // Flag to identify when the app needs to close
@@ -120,7 +122,7 @@ void mouse( nv::MouseButton::MouseButton button, bool down)
 	ui.mouse( button, int(down), x, y);
 }
 
-/*void loadTexture(int tID, const char* filepath) {
+void loadTexture(int tID, const char* filepath) {
 	FreeImage_Initialise();
 	FIBITMAP* _bitmap;
 
@@ -150,7 +152,7 @@ void mouse( nv::MouseButton::MouseButton button, bool down)
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
-}*/
+}
 
 void init()
 {
@@ -183,6 +185,10 @@ void init()
 	}
 	glLinkProgram(sProgram);
 
+	glEnable(GL_TEXTURE_2D);
+	loadTexture(0,"../data/textures/bark.jpg");
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 	//uniform locations
 	MVPlocation			= glGetUniformLocation(sProgram, "ModelViewProjection");
 	MVlocation			= glGetUniformLocation(sProgram, "ModelView");
@@ -193,6 +199,7 @@ void init()
 	lightLocation		= glGetUniformLocation(sProgram, "light");
 	litLocation			= glGetUniformLocation(sProgram, "lit");
 	texHeightLocation	= glGetUniformLocation(sProgram, "texHeight");
+	texDiffuseLocation  = glGetUniformLocation(sProgram, "texColor");
 
 	GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR) {
@@ -283,7 +290,7 @@ int main( int argc, char **argv)
 	Icosahedron ico;
 	Cylinder cyl;
 	GeneralizedCylinder genCyl(path, contour, thickness, water);
-	Image img("../data/textures/brick.png");
+	Image img("../data/textures/bark_DISP.png");
 	
 	/*unsigned int width = img.getWidth();
 	unsigned int height = img.getHeight();
@@ -377,6 +384,10 @@ int main( int argc, char **argv)
 		//glBindTexture(GL_TEXTURE_2D, texBufferIds[0]);
 		glBindTexture(GL_TEXTURE_2D, img.getTexBufferID());
 		glUniform1i(texHeightLocation, 0);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texBufferIds[0]);
+		glUniform1i(texDiffuseLocation, 1);
 		
 		glDrawElements(GL_PATCHES, genCyl.getIndexCount(), GL_UNSIGNED_INT, 0);
 

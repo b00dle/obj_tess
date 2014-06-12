@@ -9,7 +9,7 @@ in vec2 gTexCoord;
 
 uniform float lit;
 uniform vec3 light;
-uniform sampler2D texHeight;
+uniform sampler2D texColor;
 
 float amplify(float d, float scale, float offset) {
 	d = scale * d + offset;
@@ -26,7 +26,7 @@ void main() {
 		vec3 color = gl_FrontFacing ? vec3(1.0,0.6,0.0) : vec3(0.6,0.0,1.0);
 	#endif
 	if (lit > 0.5) {
-		color = texture(texHeight, gTexCoord).xyz; 
+		color = texture(texColor, gTexCoord).xyz; 
 		vec3 N = normalize(gFacetNormal);
 		vec3 L = light;
 		float df = abs(dot(N,L));

@@ -167,6 +167,8 @@ bool Image::createTexBuffer() {
 
 		glEnable(GL_TEXTURE_2D);
 
+		glGenTextures(1, _tBufferID);
+
 		glBindTexture(GL_TEXTURE_2D, _tBufferID[0]);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
 					FreeImage_GetWidth(_bitmap),
