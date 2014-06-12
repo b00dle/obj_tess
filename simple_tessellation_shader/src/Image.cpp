@@ -8,7 +8,9 @@ Image::Image(const char* filepath):
 	_width(0),
 	_height(0),
 	_pitch(0),
-	_pixelValues()
+	_pixelValues(),
+	_tBufferID(),
+	_doneTBufferInit(false)
 {
 	if(init()) {
 		std::cout << "loaded image: " << _filepath << "\n";
@@ -27,8 +29,16 @@ unsigned int Image::getHeight() const {
 	return _height;
 }
 
-nv::vec3f const& Image::getPixel(int x, int y) const{
+nv::vec3f const& Image::getPixel(int x, int y) const {
 	return *(_pixelValues[x][y]);
+}
+
+unsigned Image::getTexBufferID() const {
+	if(!_doneTBufferInit) {
+		std::cout << "ID for Texture Buffer might be invalid or has not been set.\n";
+		return 255;
+	}
+	return _tBufferID[0];
 }
 
 void Image::setPixel(int x, int y, nv::vec3f const& c){
@@ -41,6 +51,18 @@ void Image::setPixel(int x, int y, float r, float g, float b){
 	_pixelValues[x][y]->x = r;
 	_pixelValues[x][y]->y = g;
 	_pixelValues[x][y]->z = b;
+}
+
+void Image::setTexBuffer(unsigned tbID) {
+	if(_doneTBufferInit) {
+		std::cout << "Texture buffer already set to: " << _tBufferID[0] << std::endl;
+		return;
+	}
+	
+	_tBufferID[0] = tbID;
+
+	if(!createTexBuffer())
+		std::cout << "error while creating texture buffer\n";
 }
 
 bool Image::saveToFile(FREE_IMAGE_FORMAT format, const char* filepath) {
@@ -133,4 +155,37 @@ bool Image::updateBitmap() {
 	}
 
 	return true;
+}
+
+bool Image::createTexBuffer() {
+	if(updateBitmap()){
+		FIBITMAP* _b = FreeImage_ToneMapping(_bitmap, FITMO_REINHARD05); //convert RGBF to bitmap
+		FreeImage_AdjustColors(_b, -5.0, 5.0, 0.45);
+		glGenTextures(1, _tBufferID);
+
+		unsigned char* pixelData = FreeImage_GetBits(_b);
+
+		glEnable(GL_TEXTURE_2D);
+
+		glBindTexture(GL_TEXTURE_2D, _tBufferID[0]);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+					FreeImage_GetWidth(_bitmap),
+					FreeImage_GetHeight(_bitmap),
+					0, GL_BGR, GL_UNSIGNED_BYTE,
+					pixelData
+		);
+
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		_doneTBufferInit = true;
+
+		return true;
+	}
+
+	return false;
 }

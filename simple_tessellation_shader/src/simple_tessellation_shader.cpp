@@ -19,7 +19,6 @@
 //shaders
 unsigned sProgram;
 unsigned shaderIds[5] = { 0u };
-unsigned texBufferIds[1] = { 0u };
 
 //uniform locations
 unsigned MVPlocation		= 0;
@@ -30,7 +29,7 @@ unsigned lodLocation		= 0;
 unsigned distanceLocation	= 0;
 unsigned lightLocation		= 0;
 unsigned litLocation		= 0;
-unsigned texLocation		= 0;
+unsigned texHeightLocation	= 0;
 
 // Flag to identify when the app needs to close
 bool running = true;
@@ -121,7 +120,7 @@ void mouse( nv::MouseButton::MouseButton button, bool down)
 	ui.mouse( button, int(down), x, y);
 }
 
-void loadTexture(int tID, const char* filepath) {
+/*void loadTexture(int tID, const char* filepath) {
 	FreeImage_Initialise();
 	FIBITMAP* _bitmap;
 
@@ -151,7 +150,7 @@ void loadTexture(int tID, const char* filepath) {
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
-}
+}*/
 
 void init()
 {
@@ -184,28 +183,6 @@ void init()
 	}
 	glLinkProgram(sProgram);
 
-	//generate textures
-	glGenTextures(1, texBufferIds);
-	loadTexture(0, "../data/textures/stone.jpg");
-	
-	/*
-	Image img("../data/textures/stone.jpg");
-
-	unsigned int width = img.getWidth();
-	unsigned int height = img.getHeight();
-	nv::vec3f add(0.8,0.2,0.1);
-	for(unsigned int x = 0; x < 649; ++x){
-		for(unsigned int y = 0; y < 649; ++y){
-			img.setPixel(x, y, 0.5*img.getPixel(x,y) + 0.5*add);
-		}
-	}
-
-	if(img.saveToFile(FIF_JPEG, "../data/textures/stone2.jpg"))
-		std::cout << "successfully saved image\n" << std::endl; 
-	*/
-	
-	glBindTexture(GL_TEXTURE_2D, 0); //safety unbind
-	
 	//uniform locations
 	MVPlocation			= glGetUniformLocation(sProgram, "ModelViewProjection");
 	MVlocation			= glGetUniformLocation(sProgram, "ModelView");
@@ -215,7 +192,7 @@ void init()
 	distanceLocation	= glGetUniformLocation(sProgram, "distance");
 	lightLocation		= glGetUniformLocation(sProgram, "light");
 	litLocation			= glGetUniformLocation(sProgram, "lit");
-	texLocation			= glGetUniformLocation(sProgram, "tex");
+	texHeightLocation	= glGetUniformLocation(sProgram, "texHeight");
 
 	GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR) {
@@ -288,7 +265,8 @@ int main( int argc, char **argv)
 	temp.push_back(nv::vec4f(1,		0,		-0.5,	1));
 	temp.push_back(nv::vec4f(1,		0,		0.5,	1));
 
-	Contour contour(temp);
+	//Contour contour(temp);
+	Contour contour;
 
 	//thickness
 	std::vector<float> thickness;
@@ -305,6 +283,20 @@ int main( int argc, char **argv)
 	Icosahedron ico;
 	Cylinder cyl;
 	GeneralizedCylinder genCyl(path, contour, thickness, water);
+	Image img("../data/textures/brick.png");
+	
+	/*unsigned int width = img.getWidth();
+	unsigned int height = img.getHeight();
+	nv::vec3f add(0.8,0.2,0.1);
+	for(unsigned int x = 0; x < 649; ++x){
+		for(unsigned int y = 0; y < 649; ++y){
+			img.setPixel(x, y, 0.5*img.getPixel(x,y) + 0.5*add);
+		}
+	}*/
+	
+	img.setTexBuffer(0);
+	glBindTexture(GL_TEXTURE_2D, 0); //safety unbind
+	
 	//ObjFormatter obj("cylinder_right.obj");
 
 	float angle = 0.0f;
@@ -382,8 +374,9 @@ int main( int argc, char **argv)
 		glBindVertexArray(genCyl.getVAO());
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texBufferIds[0]);
-		glUniform1i(texLocation, 0);
+		//glBindTexture(GL_TEXTURE_2D, texBufferIds[0]);
+		glBindTexture(GL_TEXTURE_2D, img.getTexBufferID());
+		glUniform1i(texHeightLocation, 0);
 		
 		glDrawElements(GL_PATCHES, genCyl.getIndexCount(), GL_UNSIGNED_INT, 0);
 
