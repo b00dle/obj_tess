@@ -12,7 +12,9 @@ out vec3 teNormal;
 
 uniform mat4 ModelViewProjection;
 uniform mat4 ModelView;
-
+uniform float df;
+uniform float dMapping;
+	
 uniform sampler2D texHeight;
 
 void main(){
@@ -31,9 +33,10 @@ void main(){
 	vec2 tc2 = gl_TessCoord.z * tcTexCoord[2];	
 	teTexCoord = tc0 + tc1 + tc2;
 
-	
-	float height = texture(texHeight, teTexCoord).x;
-	pos += normal * (height * 0.2f);
+	if(dMapping > 0.5){
+		float height = texture(texHeight, teTexCoord).x;
+		pos += normal * (height * df);
+	}
 
 	gl_Position = ModelViewProjection * vec4(pos, 1);
 	teNormal	= vec3(ModelView * vec4(normal,0.0)).xyz;
