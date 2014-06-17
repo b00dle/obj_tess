@@ -16,6 +16,12 @@
 #include "Contour.h"
 #include "Image.h"
 
+#include "BarkModule.h"
+#include "Crust.h"
+#include "Fracture.h"
+#include "BarkStrip.h"
+
+
 //shaders
 unsigned sProgram;
 unsigned shaderIds[5] = { 0u };
@@ -374,6 +380,15 @@ void init()
 
 int main( int argc, char **argv)
 {
+	BarkModule* crust = new Crust(0.0f,0.0f,0.0f,12.0f);
+	BarkModule* fracture = new Fracture(0.0f,0.0f,0.0f);
+
+	Crust* castCrust = (Crust*) crust;
+
+	std::cout << "crust type: " << crust->type() << std::endl;
+	std::cout << "crust threshold: " << castCrust->getThreshold() << std::endl;
+	std::cout << "fracture type: " << fracture->type() << std::endl;
+	
 	// Initialize window system portion of library (potenially refactor to have library-wide init?)
 	nv::InitWindowSystem();
 

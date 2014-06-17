@@ -52,7 +52,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\sdk_swak;..\glew\include;..\glut\include;..\glm;..\freeimage\include;include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\sdk_swak;..\glew\include;..\glut\include;..\glm;..\freeimage\include;include;include/bark</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_CONSOLE;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -80,7 +80,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <Optimization>Full</Optimization>
-      <AdditionalIncludeDirectories>..\sdk_swak;..\glew\include;..\glut\include;..\glm;..\freeimage\include;include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\sdk_swak;..\glew\include;..\glut\include;..\glm;..\freeimage\include;include;include/bark</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_CONSOLE;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
@@ -115,6 +115,12 @@
     <None Include="vertex.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\bark\Bark.cpp" />
+    <ClCompile Include="src\bark\BarkModule.cpp" />
+    <ClCompile Include="src\bark\BarkStrip.cpp" />
+    <ClCompile Include="src\bark\BarkTexGenerator.cpp" />
+    <ClCompile Include="src\bark\Crust.cpp" />
+    <ClCompile Include="src\bark\Fracture.cpp" />
     <ClCompile Include="src\Bezierpath.cpp" />
     <ClCompile Include="src\Contour.cpp" />
     <ClCompile Include="src\cylinder.cpp" />
@@ -128,6 +134,12 @@
     <ClCompile Include="src\simple_tessellation_shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\BarkTexGenerator.h" />
+    <ClInclude Include="include\bark\Bark.h" />
+    <ClInclude Include="include\bark\BarkModule.h" />
+    <ClInclude Include="include\bark\BarkStrip.h" />
+    <ClInclude Include="include\bark\Crust.h" />
+    <ClInclude Include="include\bark\Fracture.h" />
     <ClInclude Include="include\Bezierpath.h" />
     <ClInclude Include="include\Contour.h" />
     <ClInclude Include="include\cylinder.hpp" />

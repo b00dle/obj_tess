@@ -10,6 +10,12 @@
     <Filter Include="Shader Files">
       <UniqueIdentifier>{E64E1B89-E3E8-484A-8516-DF05EE4B47A5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\bark">
+      <UniqueIdentifier>{e0de6cc5-3c2a-49e3-996e-1cf065c97bce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\bark">
+      <UniqueIdentifier>{bed500b9-5cd5-4c09-b9d5-44c55d835fe4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="vertex.glsl">
@@ -62,6 +68,24 @@
     <ClCompile Include="src\Image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\bark\BarkModule.cpp">
+      <Filter>Source Files\bark</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bark\Crust.cpp">
+      <Filter>Source Files\bark</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bark\Fracture.cpp">
+      <Filter>Source Files\bark</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bark\BarkStrip.cpp">
+      <Filter>Source Files\bark</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bark\Bark.cpp">
+      <Filter>Source Files\bark</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bark\BarkTexGenerator.cpp">
+      <Filter>Source Files\bark</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\cylinder.hpp">
@@ -96,6 +120,24 @@
     </ClInclude>
     <ClInclude Include="include\Image.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\bark\BarkModule.h">
+      <Filter>Header Files\bark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\bark\Crust.h">
+      <Filter>Header Files\bark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\bark\BarkStrip.h">
+      <Filter>Header Files\bark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\bark\Fracture.h">
+      <Filter>Header Files\bark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\bark\Bark.h">
+      <Filter>Header Files\bark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BarkTexGenerator.h">
+      <Filter>Header Files\bark</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
