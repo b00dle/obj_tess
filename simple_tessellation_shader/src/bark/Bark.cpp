@@ -1,4 +1,6 @@
 #include "Bark.h"
+#include "Fracture.h"
+#include "Crust.h"
 
 Bark::Bark(void):
 	_growthRate(0.0f),
@@ -27,4 +29,22 @@ Bark::Bark(Bark const& bark):
 
 
 Bark::~Bark(void) {
+}
+
+void Bark::grow() {
+	for(auto strip : _barkStrips)
+		strip->extendLength(_growthRate, _stiffness);
+	
+	propagateFractures();
+}
+
+void Bark::propagateFractures() {
+	std::vector<BarkStrip*>::iterator strip = _barkStrips.begin();
+	std::list<BarkModule*>::iterator module = (*strip)->getBarkModules().begin();
+	float pos = 0.0f;
+	while(strip != _barkStrips.end()) {
+		if((*module)->type() == 1) {
+			Fracture* fracture = (Fracture*) (*module);
+		}
+	}
 }

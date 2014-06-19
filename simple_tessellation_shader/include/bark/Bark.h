@@ -11,6 +11,9 @@ class Bark {
 		Bark(Bark const&);
 		~Bark(void);
 
+		void grow();
+		void propagateFractures();
+
 	private:
 		float					_growthRate;
 		float					_stiffness;

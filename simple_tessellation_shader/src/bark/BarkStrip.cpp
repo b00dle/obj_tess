@@ -52,6 +52,10 @@ BarkStrip::BarkStrip(BarkStrip const& barkStrip):
 BarkStrip::~BarkStrip(void) {
 }
 
+std::list<BarkModule*>& BarkStrip::getBarkModules(){
+	return _barkModules;
+}
+
 void BarkStrip::extendLength(float e, float globalStiffness) {
 	float ePartial = e / _barkModules.size(); //equally subdivide e
 	std::list<BarkModule*>::iterator module = _barkModules.begin();
@@ -64,7 +68,7 @@ void BarkStrip::extendLength(float e, float globalStiffness) {
 		if((*module)->solveStress()) {
 			
 			Crust* crust = (Crust*) (*module);
-			float kf = 100.0f/crust->getRestLength();
+			float kf = 10.0f/crust->getRestLength();
 			float ks = crust->getStiffness();
 			float eRemainder = crust->getExtension() * (kf) / (ks + kf);
 			

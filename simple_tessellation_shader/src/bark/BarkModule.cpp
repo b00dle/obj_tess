@@ -1,7 +1,7 @@
 #include "BarkModule.h"
 #include <math.h>
 
-#define EPSILON 0.00001f
+#define EPSILON 0.00000001f
 
 BarkModule::BarkModule(void):
 	_restLength(1.0f),
@@ -40,5 +40,6 @@ float	BarkModule::getStiffness()	const {
 void BarkModule::extend(float e) {
 	float oldExtension = _extension;
 	_extension += e;
-	_stiffness = _stiffness*oldExtension / _extension;
+	if(fabs(oldExtension) > EPSILON)
+		_stiffness = _stiffness*oldExtension / _extension;
 }
