@@ -18,6 +18,7 @@
 
 #include <list>
 #include "BarkModule.h"
+#include "Bark.h"
 #include "Crust.h"
 #include "Fracture.h"
 #include "BarkStrip.h"
@@ -381,16 +382,74 @@ void init()
 
 int main( int argc, char **argv)
 {
-	BarkModule* crust = new Crust(1.0f,0.0f,1.0f,9.0f);
+	BarkModule* crust1 = new Crust(1.0f,0.0f,1.0f,9.0f);
+	BarkModule* crust2 = new Crust(1.0f,0.0f,1.0f,20.0f);
+	BarkModule* crust3 = new Crust(1.0f,0.0f,1.0f,10.0f);
+	
 	std::list<BarkModule*> barkModules;
-	barkModules.push_back(crust);
-	BarkStrip barkStrip(barkModules);
+	barkModules.push_back(crust1);
+	BarkStrip* barkStrip1 = new BarkStrip(barkModules);
+	
+	barkModules.pop_back();
+	barkModules.push_back(crust2);
+	BarkStrip* barkStrip2 = new BarkStrip(barkModules);
+
+	barkModules.pop_back();
+	barkModules.push_back(crust3);
+	BarkStrip* barkStrip3 = new BarkStrip(barkModules);
+
+	std::vector<BarkStrip*> barkStrips;
+	barkStrips.push_back(barkStrip1);
+	barkStrips.push_back(barkStrip2);
+	barkStrips.push_back(barkStrip3);
+	Bark bark(8.0f, 5.0f, barkStrips);
+
 	for(int i = 0; i < 10; ++i){
-		barkStrip.extendLength(10.0f, 5.0f);
+		bark.grow();
 		std::cout << i << std::endl;
 	}
-	std::cout << "Number of Moduls: " << barkStrip.getBarkModules().size() << std::endl;
-	system("PAUSE");	
+	
+	/*std::vector<float>moduleWidths;
+	std::vector<unsigned>moduleTypes;
+	for(auto module : barkModules){
+		moduleWidths.push_back( (module->getRestLength() + module->getExtension()) / length );
+		moduleTypes.push_back( module->type() );
+	}
+
+	Image img("../data/textures/bark_color.jpg");
+	*/
+
+	/*unsigned int width = img.getWidth();
+	unsigned int height = img.getHeight();
+	nv::vec3f add(0.8,0.2,0.1);
+	for(unsigned int x = 0; x < 649; ++x){
+		for(unsigned int y = 0; y < 649; ++y){
+			img.setPixel(x, y, 0.5*img.getPixel(x,y) + 0.5*add);
+		}
+	}
+*/
+	/*unsigned int width = img.getWidth();
+	unsigned int height = img.getHeight();
+	nv::vec3f black(0.0,0.0,0.0);
+	nv::vec3f white(1.0,1.0,1.0);
+	int moduleWidth;
+	unsigned int x = 0;
+	for(int i = 0; i < moduleTypes.size(); ++i){
+		moduleWidth = width * moduleWidths[i];
+		for(int w = x; w < x + moduleWidth; ++w) {
+			for(unsigned int y = 0; y < 50; ++y){
+				if(moduleTypes[i] == 0)
+					img.setPixel(w, y, white);
+				else
+					img.setPixel(w, y, black);
+			}
+		}
+		x += moduleWidth;
+	}
+
+	img.saveToFile(FIF_JPEG, "../data/textures/test.jpg");	
+	*/
+	system("PAUSE");
 	//// Initialize window system portion of library (potenially refactor to have library-wide init?)
 	//nv::InitWindowSystem();
 

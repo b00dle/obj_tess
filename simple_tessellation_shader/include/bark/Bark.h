@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BarkStrip.h"
+#include "Fracture.h"
 
 #include <vector>
 
@@ -13,6 +14,10 @@ class Bark {
 
 		void grow();
 		void propagateFractures();
+
+	private:
+		void propagateDown(std::vector<BarkStrip*>::iterator const&, Fracture*, float);
+		void propagateUp(std::vector<BarkStrip*>::iterator const&, Fracture*, float);
 
 	private:
 		float					_growthRate;

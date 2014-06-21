@@ -3,14 +3,17 @@
 #include "Fracture.h"
 #include <stdlib.h>
 #include <time.h>
+#include <iostream>
 
 BarkStrip::BarkStrip(void):
-	_barkModules()
+	_barkModules(),
+	_length(0.0f)
 {
 }
 
 BarkStrip::BarkStrip(std::list<BarkModule*> const& barkModules):
-	_barkModules()
+	_barkModules(),
+	_length(0.0f)
 {
 	Crust* crust = nullptr;
 	Fracture* fracture = nullptr;
@@ -28,10 +31,16 @@ BarkStrip::BarkStrip(std::list<BarkModule*> const& barkModules):
 	fracture = nullptr;
 	delete crust;
 	delete fracture;
+
+	for(auto module : _barkModules) {
+		_length += module->getExtension() + module->getRestLength();
+	}
+	
 }
 
 BarkStrip::BarkStrip(BarkStrip const& barkStrip):
-	_barkModules()
+	_barkModules(),
+	_length(barkStrip._length)
 {
 	Crust* crust = nullptr;
 	Fracture* fracture = nullptr;
@@ -58,10 +67,15 @@ std::list<BarkModule*>& BarkStrip::getBarkModules(){
 	return _barkModules;
 }
 
+float BarkStrip::getLength() const {
+	return _length;
+}
+
 void BarkStrip::extendLength(float e, float globalStiffness) {
 	float ePartial = e / _barkModules.size(); //equally subdivide e
+	_length += e;
+
 	std::list<BarkModule*>::iterator module = _barkModules.begin();
-	
 	while(module != _barkModules.end()) {
 	
 		//float eModule = ePartial * (*(module))->getStiffness() / globalStiffness; //scale e dependent on module stiffness
@@ -70,13 +84,19 @@ void BarkStrip::extendLength(float e, float globalStiffness) {
 		if((*module)->solveStress()) {
 			
 			Crust* crust = (Crust*) (*module);
-			float kf = 10.0f/crust->getRestLength();
+			float kf = 2000.0f/crust->getRestLength();
 			float ks = crust->getStiffness();
 			float eRemainder = crust->getExtension() * (kf) / (ks + kf);
 			
+			srand(time(0)*10000000);
+			float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+			//float cutPos = (0.5f + 1.0f*r);
+
 			float fractureExtension = crust->getExtension() - eRemainder;
-			float crustLength    = crust->getRestLength() / 2.0f;
-			float crustStiffness = crust->getRestLength() * crust->getStiffness() / crustLength;
+			float crustLength1    = crust->getRestLength() * r;
+			float crustLength2    = crust->getRestLength() - crustLength1;
+			float crustStiffness1 = crust->getRestLength() * crust->getStiffness() / crustLength1;
+			float crustStiffness2 = crust->getRestLength() * crust->getStiffness() / crustLength2;
 			float crustThreshold = crust->getThreshold();
 			
 			/*
@@ -89,10 +109,10 @@ void BarkStrip::extendLength(float e, float globalStiffness) {
 				cThreshold = crustThreshold / 2.0f - (1.0f / (float) (rand() % 4 + 1) );
 			*/
 			
-			_barkModules.insert(module, new Crust(crustLength + eRemainder/2.0f,
+			_barkModules.insert(module, new Crust(crustLength1 + eRemainder * r,
 												0.0f,
-												crustStiffness,
-												crustThreshold / 2.0f)
+												crustStiffness1,
+												crustThreshold * r)
 			);
 			
 			_barkModules.insert(module, new Fracture(0.0f,
@@ -107,10 +127,10 @@ void BarkStrip::extendLength(float e, float globalStiffness) {
 				cThreshold = crustThreshold / 2.0f * -(1.0f / (float) (rand() % 4 + 1) );
 			*/
 
-			_barkModules.insert(module, new Crust(crustLength + eRemainder/2.0f,
+			_barkModules.insert(module, new Crust(crustLength2 + eRemainder * (1 - r),
 												0.0f,
-												crustStiffness,
-												crustThreshold / 2.0f)
+												crustStiffness2,
+												crustThreshold * (1 - r))
 			);
 
 			module = _barkModules.erase(module);

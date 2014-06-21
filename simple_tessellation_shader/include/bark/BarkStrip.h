@@ -12,10 +12,12 @@ class BarkStrip {
 		~BarkStrip(void);
 
 		std::list<BarkModule*>& getBarkModules();
+		float getLength() const;
 
 		void extendLength(float, float);
 
 	private:
 		std::list<BarkModule*> _barkModules;
+		float _length;
 };
 
