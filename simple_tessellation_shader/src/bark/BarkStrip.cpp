@@ -1,6 +1,8 @@
 #include "BarkStrip.h"
 #include "Crust.h"
 #include "Fracture.h"
+#include <stdlib.h>
+#include <time.h>
 
 BarkStrip::BarkStrip(void):
 	_barkModules()
@@ -62,8 +64,8 @@ void BarkStrip::extendLength(float e, float globalStiffness) {
 	
 	while(module != _barkModules.end()) {
 	
-		float eModule = ePartial * (*(module))->getStiffness() / globalStiffness; //scale e dependent on module stiffness
-		(*module)->extend(eModule);
+		//float eModule = ePartial * (*(module))->getStiffness() / globalStiffness; //scale e dependent on module stiffness
+		(*module)->extend(ePartial);
 		
 		if((*module)->solveStress()) {
 			
@@ -77,21 +79,38 @@ void BarkStrip::extendLength(float e, float globalStiffness) {
 			float crustStiffness = crust->getRestLength() * crust->getStiffness() / crustLength;
 			float crustThreshold = crust->getThreshold();
 			
-			_barkModules.insert(module, new Crust(crustLength,
-												eRemainder/2.0f,
+			/*
+			srand(time(NULL));		
+			
+			float cThreshold;
+			if((float) (rand() % 2) > 0.5f)
+				cThreshold = crustThreshold / 2.0f + (1.0f / (float) (rand() % 4 + 1) );
+			else
+				cThreshold = crustThreshold / 2.0f - (1.0f / (float) (rand() % 4 + 1) );
+			*/
+			
+			_barkModules.insert(module, new Crust(crustLength + eRemainder/2.0f,
+												0.0f,
 												crustStiffness,
-												crustThreshold)
+												crustThreshold / 2.0f)
 			);
 			
 			_barkModules.insert(module, new Fracture(0.0f,
 													fractureExtension,
 													kf)
 			);
-			
-			_barkModules.insert(module, new Crust(crustLength,
-												eRemainder/2.0f,
+
+			/*
+			if((float) (rand() % 2) > 0.5f)
+				cThreshold = crustThreshold / 2.0f * (1.0f / (float) (rand() % 4 + 1) );
+			else
+				cThreshold = crustThreshold / 2.0f * -(1.0f / (float) (rand() % 4 + 1) );
+			*/
+
+			_barkModules.insert(module, new Crust(crustLength + eRemainder/2.0f,
+												0.0f,
 												crustStiffness,
-												crustThreshold)
+												crustThreshold / 2.0f)
 			);
 
 			module = _barkModules.erase(module);

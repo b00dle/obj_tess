@@ -40,6 +40,6 @@ float	BarkModule::getStiffness()	const {
 void BarkModule::extend(float e) {
 	float oldExtension = _extension;
 	_extension += e;
-	if(fabs(oldExtension) > EPSILON)
+	if(oldExtension > EPSILON)
 		_stiffness = _stiffness*oldExtension / _extension;
 }

@@ -385,150 +385,151 @@ int main( int argc, char **argv)
 	std::list<BarkModule*> barkModules;
 	barkModules.push_back(crust);
 	BarkStrip barkStrip(barkModules);
-	for(int i = 0; i < 100; ++i){
+	for(int i = 0; i < 10; ++i){
 		barkStrip.extendLength(10.0f, 5.0f);
 		std::cout << i << std::endl;
 	}
-	
-	// Initialize window system portion of library (potenially refactor to have library-wide init?)
-	nv::InitWindowSystem();
+	std::cout << "Number of Moduls: " << barkStrip.getBarkModules().size() << std::endl;
+	system("PAUSE");	
+	//// Initialize window system portion of library (potenially refactor to have library-wide init?)
+	//nv::InitWindowSystem();
 
-	// Create window offers no options, to more closely represent the constrained tablet environment
-	//  Window is always double-buffered with Depth
-	//  On Windows, the size defaults to 720p
-	nv::CreateWindow();
+	//// Create window offers no options, to more closely represent the constrained tablet environment
+	////  Window is always double-buffered with Depth
+	////  On Windows, the size defaults to 720p
+	//nv::CreateWindow();
 
-	// Calback function registration
-	nv::RegisterKeydownCallback( key);
-	nv::RegisterMouseButtonCallback( mouse);
+	//// Calback function registration
+	//nv::RegisterKeydownCallback( key);
+	//nv::RegisterMouseButtonCallback( mouse);
 
-	glewInit();
+	//glewInit();
 
-	printf( "GL version %s\n", glGetString(GL_VERSION));
+	//printf( "GL version %s\n", glGetString(GL_VERSION));
 
-	if (!glewIsSupported("GL_VERSION_4_2"))
-	{
-        printf("Sample requires 4.2\n");
-		return -1; 
-	}
+	//if (!glewIsSupported("GL_VERSION_4_2"))
+	//{
+ //       printf("Sample requires 4.2\n");
+	//	return -1; 
+	//}
 
-	if (glewIsSupported("GL_ARB_shading_language_include"))
-		printf("Supports glsl include\n");
+	//if (glewIsSupported("GL_ARB_shading_language_include"))
+	//	printf("Supports glsl include\n");
 
-	init();
+	//init();
 
-	printf( "\nCommands:\n");
-	nv::CVarRegistry::Instance().PrintHelp();
+	//printf( "\nCommands:\n");
+	//nv::CVarRegistry::Instance().PrintHelp();
 
+	////
+	//// Explicit run loop, unlike GLUT, allows polling instead of callbacks
+	////   Probably want to add callback for rendering and RunLoop function toallow passing the responsibility off
+	////   May also want inlined C++ classexposing these as methods to allow a more OOP-like interface 
+	////
+
+	//GLint MaxPatchVertices = 0;
+	//glGetIntegerv(GL_MAX_PATCH_VERTICES, &MaxPatchVertices);
+	//printf("Max supported patch vertices %d\n", MaxPatchVertices);
+
+	////////GENERALIZED CYLINDER//////
 	//
-	// Explicit run loop, unlike GLUT, allows polling instead of callbacks
-	//   Probably want to add callback for rendering and RunLoop function toallow passing the responsibility off
-	//   May also want inlined C++ classexposing these as methods to allow a more OOP-like interface 
+	////path
+	//nv::matrix4f start, mid, end;
+	//start.make_identity();
+	//end.make_identity();
+	//start.set_translate(nv::vec3f(0.0f,-1.0f,0.0f));
+	//end.set_translate(nv::vec3f(0.0f,1.0f,0.0f));
 	//
+	//Path path(start);
+	//path.addSegment(end);
+	//path.calculate();
+	//
+	////contour
+	//std::vector<nv::vec4f> temp;
+	//temp.push_back(nv::vec4f(0,		0,		1,		1));
+	//temp.push_back(nv::vec4f(-1,	0,		0.5,	1));
+	//temp.push_back(nv::vec4f(-1,	0,		-0.5,	1));
+	//temp.push_back(nv::vec4f(0,		0,		-1,		1));
+	//temp.push_back(nv::vec4f(1,		0,		-0.5,	1));
+	//temp.push_back(nv::vec4f(1,		0,		0.5,	1));
 
-	GLint MaxPatchVertices = 0;
-	glGetIntegerv(GL_MAX_PATCH_VERTICES, &MaxPatchVertices);
-	printf("Max supported patch vertices %d\n", MaxPatchVertices);
+	////Contour contour(temp);
+	//Contour contour;
 
-	//////GENERALIZED CYLINDER//////
-	
-	//path
-	nv::matrix4f start, mid, end;
-	start.make_identity();
-	end.make_identity();
-	start.set_translate(nv::vec3f(0.0f,-1.0f,0.0f));
-	end.set_translate(nv::vec3f(0.0f,1.0f,0.0f));
-	
-	Path path(start);
-	path.addSegment(end);
-	path.calculate();
-	
-	//contour
-	std::vector<nv::vec4f> temp;
-	temp.push_back(nv::vec4f(0,		0,		1,		1));
-	temp.push_back(nv::vec4f(-1,	0,		0.5,	1));
-	temp.push_back(nv::vec4f(-1,	0,		-0.5,	1));
-	temp.push_back(nv::vec4f(0,		0,		-1,		1));
-	temp.push_back(nv::vec4f(1,		0,		-0.5,	1));
-	temp.push_back(nv::vec4f(1,		0,		0.5,	1));
+	////thickness
+	//std::vector<float> thickness;
+	//thickness.push_back(1.0f);
+	//thickness.push_back(1.0f);
+	//
+	////water
+	//std::vector<float> water;
+	//water.push_back(1.0f);
+	//water.push_back(1.0f);
 
-	//Contour contour(temp);
-	Contour contour;
+	/////////////////////////////////
 
-	//thickness
-	std::vector<float> thickness;
-	thickness.push_back(1.0f);
-	thickness.push_back(1.0f);
-	
-	//water
-	std::vector<float> water;
-	water.push_back(1.0f);
-	water.push_back(1.0f);
+	//Icosahedron ico;
+	//Cylinder cyl;
+	//GeneralizedCylinder genCyl(path, contour, thickness, water);
+	//
+	////Image img("../data/textures/bark_DISP.jpg");
+	//
+	///*unsigned int width = img.getWidth();
+	//unsigned int height = img.getHeight();
+	//nv::vec3f add(0.8,0.2,0.1);
+	//for(unsigned int x = 0; x < 649; ++x){
+	//	for(unsigned int y = 0; y < 649; ++y){
+	//		img.setPixel(x, y, 0.5*img.getPixel(x,y) + 0.5*add);
+	//	}
+	//}*/
+	//
+	////img.setTexBuffer(0);
+	////glBindTexture(GL_TEXTURE_2D, 0); //safety unbind
+	//
+	////ObjFormatter obj("cylinder_right.obj");
 
-	///////////////////////////////
+	//float angle = 0.0f;
+	//while (running)
+	//{
+	//	// check the size every frame, to make sure the window has not been resized
+	//	int width, height;
+	//	nv::GetWindowSize( width, height);
 
-	Icosahedron ico;
-	Cylinder cyl;
-	GeneralizedCylinder genCyl(path, contour, thickness, water);
-	
-	//Image img("../data/textures/bark_DISP.jpg");
-	
-	/*unsigned int width = img.getWidth();
-	unsigned int height = img.getHeight();
-	nv::vec3f add(0.8,0.2,0.1);
-	for(unsigned int x = 0; x < 649; ++x){
-		for(unsigned int y = 0; y < 649; ++y){
-			img.setPixel(x, y, 0.5*img.getPixel(x,y) + 0.5*add);
-		}
-	}*/
-	
-	//img.setTexBuffer(0);
-	//glBindTexture(GL_TEXTURE_2D, 0); //safety unbind
-	
-	//ObjFormatter obj("cylinder_right.obj");
+	//	// clear color, dpeth, and stencil, because the UI code relies on stencil
+	//	glClearColor( 0.7, 0.7, 0.7, 1.0);
+	//	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	float angle = 0.0f;
-	while (running)
-	{
-		// check the size every frame, to make sure the window has not been resized
-		int width, height;
-		nv::GetWindowSize( width, height);
+	//	glEnable(GL_DEPTH_TEST);
 
-		// clear color, dpeth, and stencil, because the UI code relies on stencil
-		glClearColor( 0.7, 0.7, 0.7, 1.0);
-		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//	setUniformValues(width, height, angle);
 
-		glEnable(GL_DEPTH_TEST);
+	//	angle += 0.5f;
+	//	if (angle >= 360.0f)
+	//		angle -= 360.0f;
 
-		setUniformValues(width, height, angle);
+	//	glEnable(GL_PROGRAM_POINT_SIZE_EXT);
+	//	glPointSize(4);
 
-		angle += 0.5f;
-		if (angle >= 360.0f)
-			angle -= 360.0f;
+	//	glPatchParameteri(GL_PATCH_VERTICES, 3);
+	//	glBindVertexArray(genCyl.getVAO());
+	//	
+	//	glDrawElements(GL_PATCHES, genCyl.getIndexCount(), GL_UNSIGNED_INT, 0);
 
-		glEnable(GL_PROGRAM_POINT_SIZE_EXT);
-		glPointSize(4);
+	//	//unbind everything
+	//	glBindTexture(GL_TEXTURE_2D, 0);
+	//	glBindVertexArray(0);
+	//	glUseProgram(0);
 
-		glPatchParameteri(GL_PATCH_VERTICES, 3);
-		glBindVertexArray(genCyl.getVAO());
-		
-		glDrawElements(GL_PATCHES, genCyl.getIndexCount(), GL_UNSIGNED_INT, 0);
+	//	generateUI(width, height);
 
-		//unbind everything
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glBindVertexArray(0);
-		glUseProgram(0);
+	//	GLenum err;
+	//	while ((err = glGetError()) != GL_NO_ERROR) {
+	//		std::cerr << "OpenGL error: " << err << std::endl;
+	//		exit(-2);
+	//	}
 
-		generateUI(width, height);
-
-		GLenum err;
-		while ((err = glGetError()) != GL_NO_ERROR) {
-			std::cerr << "OpenGL error: " << err << std::endl;
-			exit(-2);
-		}
-
-		nv::SwapBuffers();
-	}
+	//	nv::SwapBuffers();
+	//}
 
 	return 0; 
 }
