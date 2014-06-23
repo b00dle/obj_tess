@@ -12,6 +12,8 @@ class Bark {
 		Bark(Bark const&);
 		~Bark(void);
 
+		std::vector<BarkStrip*> const& getBarkStrips() const;
+
 		void grow();
 		void propagateFractures();
 

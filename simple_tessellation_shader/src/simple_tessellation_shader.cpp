@@ -382,9 +382,9 @@ void init()
 
 int main( int argc, char **argv)
 {
-	BarkModule* crust1 = new Crust(1.0f,0.0f,1.0f,9.0f);
-	BarkModule* crust2 = new Crust(1.0f,0.0f,1.0f,20.0f);
-	BarkModule* crust3 = new Crust(1.0f,0.0f,1.0f,10.0f);
+	BarkModule* crust1 = new Crust(1.0f,0.0f,1.0f,10.0f);
+	BarkModule* crust2 = new Crust(1.0f,0.0f,1.0f,40.0f);
+	BarkModule* crust3 = new Crust(1.0f,0.0f,1.0f,40.0f);
 	
 	std::list<BarkModule*> barkModules;
 	barkModules.push_back(crust1);
@@ -404,21 +404,120 @@ int main( int argc, char **argv)
 	barkStrips.push_back(barkStrip3);
 	Bark bark(8.0f, 5.0f, barkStrips);
 
-	for(int i = 0; i < 10; ++i){
+	for(int i = 0; i < 3; ++i){
 		bark.grow();
 		std::cout << i << std::endl;
 	}
-	
-	/*std::vector<float>moduleWidths;
-	std::vector<unsigned>moduleTypes;
-	for(auto module : barkModules){
-		moduleWidths.push_back( (module->getRestLength() + module->getExtension()) / length );
-		moduleTypes.push_back( module->type() );
-	}
 
 	Image img("../data/textures/bark_color.jpg");
-	*/
+	
+	/////////// STRIP 1 //////////////
 
+	barkStrips = bark.getBarkStrips();
+	BarkStrip* barkStrip = barkStrips[0];
+	std::vector<unsigned> moduleTypes;
+	std::vector<float> moduleWidths;
+
+	float overallWidth = 0;
+	for(auto module : barkStrip->getBarkModules()){
+		moduleTypes.push_back(module->type());
+		float moduleWidth = module->getExtension() + module->getRestLength();
+		overallWidth += moduleWidth;
+		moduleWidths.push_back(moduleWidth);
+	}
+
+	for(int i = 0; i < moduleWidths.size(); ++i)
+		moduleWidths[i] /= overallWidth;
+		
+	unsigned int width = img.getWidth();
+	unsigned int height = img.getHeight();
+	nv::vec3f black(0.0,0.0,0.0);
+	nv::vec3f white(1.0,1.0,1.0);
+	int moduleWidth;
+	unsigned int y = 0;
+	for(int i = 0; i < moduleTypes.size(); ++i){
+		moduleWidth = height * moduleWidths[i];
+		for(int h = y; h < y + moduleWidth; ++h) {
+			for(unsigned int x = 0; x < 50; ++x){
+				if(moduleTypes[i] == 0)
+					img.setPixel(x, h, white);
+				else
+					img.setPixel(x, h, black);
+			}
+		}
+		y += moduleWidth;
+	}
+
+	////////STRIP 2////////////
+	barkStrips = bark.getBarkStrips();
+	barkStrip = barkStrips[1];
+
+	moduleTypes.clear();
+	moduleWidths.clear();
+	
+	overallWidth = 0;
+	for(auto module : barkStrip->getBarkModules()){
+		moduleTypes.push_back(module->type());
+		float moduleWidth = module->getExtension() + module->getRestLength();
+		overallWidth += moduleWidth;
+		moduleWidths.push_back(moduleWidth);
+	}
+
+	for(int i = 0; i < moduleWidths.size(); ++i)
+		moduleWidths[i] /= overallWidth;
+		
+	width = img.getWidth();
+	height = img.getHeight();
+	y = 0;
+	for(int i = 0; i < moduleTypes.size(); ++i){
+		moduleWidth = height * moduleWidths[i];
+		for(int h = y; h < y + moduleWidth; ++h) {
+			for(unsigned int x = 50; x < 100; ++x){
+				if(moduleTypes[i] == 0)
+					img.setPixel(x, h, white);
+				else
+					img.setPixel(x, h, black);
+			}
+		}
+		y += moduleWidth;
+	}
+
+	////////STRIP 3////////////
+	barkStrips = bark.getBarkStrips();
+	barkStrip = barkStrips[2];
+
+	moduleTypes.clear();
+	moduleWidths.clear();
+	
+	overallWidth = 0;
+	for(auto module : barkStrip->getBarkModules()){
+		moduleTypes.push_back(module->type());
+		float moduleWidth = module->getExtension() + module->getRestLength();
+		overallWidth += moduleWidth;
+		moduleWidths.push_back(moduleWidth);
+	}
+
+	for(int i = 0; i < moduleWidths.size(); ++i)
+		moduleWidths[i] /= overallWidth;
+		
+	width = img.getWidth();
+	height = img.getHeight();
+	y = 0;
+	for(int i = 0; i < moduleTypes.size(); ++i){
+		moduleWidth = height * moduleWidths[i];
+		for(int h = y; h < y + moduleWidth; ++h) {
+			for(unsigned int x = 100; x < 150; ++x){
+				if(moduleTypes[i] == 0)
+					img.setPixel(x, h, white);
+				else
+					img.setPixel(x, h, black);
+			}
+		}
+		y += moduleWidth;
+	}
+
+	img.saveToFile(FIF_JPEG, "../data/textures/test.jpg");	
+	
 	/*unsigned int width = img.getWidth();
 	unsigned int height = img.getHeight();
 	nv::vec3f add(0.8,0.2,0.1);

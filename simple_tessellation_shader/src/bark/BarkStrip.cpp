@@ -84,7 +84,7 @@ void BarkStrip::extendLength(float e, float globalStiffness) {
 		if((*module)->solveStress()) {
 			
 			Crust* crust = (Crust*) (*module);
-			float kf = 2000.0f/crust->getRestLength();
+			float kf = 200.0f/crust->getRestLength();
 			float ks = crust->getStiffness();
 			float eRemainder = crust->getExtension() * (kf) / (ks + kf);
 			

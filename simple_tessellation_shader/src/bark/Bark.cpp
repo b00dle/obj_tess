@@ -34,8 +34,12 @@ Bark::~Bark(void) {
 void Bark::grow() {
 	for(auto strip : _barkStrips)
 		strip->extendLength(_growthRate, _stiffness);
-		
+	
 	propagateFractures();
+}
+
+std::vector<BarkStrip*> const& Bark::getBarkStrips() const {
+	return _barkStrips;
 }
 
 void Bark::propagateFractures() {
