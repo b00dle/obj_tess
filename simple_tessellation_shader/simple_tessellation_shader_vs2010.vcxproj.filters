@@ -86,6 +86,9 @@
     <ClCompile Include="src\bark\BarkTexGenerator.cpp">
       <Filter>Source Files\bark</Filter>
     </ClCompile>
+    <ClCompile Include="src\Object3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\cylinder.hpp">
@@ -138,6 +141,9 @@
     </ClInclude>
     <ClInclude Include="include\BarkTexGenerator.h">
       <Filter>Header Files\bark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Object3D.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

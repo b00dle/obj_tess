@@ -33,6 +33,8 @@ void main(){
 	vec2 tc2 = gl_TessCoord.z * tcTexCoord[2];	
 	teTexCoord = tc0 + tc1 + tc2;
 
+	vec2 texCoord = teTexCoord;
+	
 	if(dMapping > 0.5){
 		float height = texture(texHeight, teTexCoord).x;
 		pos += normal * (height * df);

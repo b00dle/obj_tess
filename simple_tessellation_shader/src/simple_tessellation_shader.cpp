@@ -15,6 +15,7 @@
 #include "Path.h"
 #include "Contour.h"
 #include "Image.h"
+#include "Object3D.h"
 
 #include <list>
 #include "BarkModule.h"
@@ -22,7 +23,6 @@
 #include "Crust.h"
 #include "Fracture.h"
 #include "BarkStrip.h"
-
 
 //shaders
 unsigned sProgram;
@@ -210,13 +210,13 @@ void generateTextures() {
 	glGenTextures(3, texBufferIds);
 
 	glEnable(GL_TEXTURE_2D);
-	loadTexture(0,"../data/textures/bark_COLOR.jpg");
+	loadTexture(0,"../data/textures/face_COLOR.jpg");
 
 	glEnable(GL_TEXTURE_2D);
-	loadTexture(1,"../data/textures/bark_DISP.jpg");
+	loadTexture(1,"../data/textures/face_DISP.jpg");
 
 	glEnable(GL_TEXTURE_2D);
-	loadTexture(2,"../data/textures/bark_NRM.jpg");
+	loadTexture(2,"../data/textures/face_NRM.jpg");
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
@@ -382,141 +382,91 @@ void init()
 
 int main( int argc, char **argv)
 {
-	BarkModule* crust1 = new Crust(1.0f,0.0f,1.0f,10.0f);
-	BarkModule* crust2 = new Crust(1.0f,0.0f,1.0f,40.0f);
-	BarkModule* crust3 = new Crust(1.0f,0.0f,1.0f,40.0f);
 	
-	std::list<BarkModule*> barkModules;
-	barkModules.push_back(crust1);
-	BarkStrip* barkStrip1 = new BarkStrip(barkModules);
+	//system("PAUSE");
+
+	// Initialize window system portion of library (potenially refactor to have library-wide init?)
+	nv::InitWindowSystem();
+
+	// Create window offers no options, to more closely represent the constrained tablet environment
+	//  Window is always double-buffered with Depth
+	//  On Windows, the size defaults to 720p
+	nv::CreateWindow();
+
+	// Calback function registration
+	nv::RegisterKeydownCallback( key);
+	nv::RegisterMouseButtonCallback( mouse);
+
+	glewInit();
+
+	printf( "GL version %s\n", glGetString(GL_VERSION));
+
+	if (!glewIsSupported("GL_VERSION_4_2"))
+	{
+        printf("Sample requires 4.2\n");
+		return -1; 
+	}
+
+	if (glewIsSupported("GL_ARB_shading_language_include"))
+		printf("Supports glsl include\n");
+
+	init();
+
+	printf( "\nCommands:\n");
+	nv::CVarRegistry::Instance().PrintHelp();
+
+	//
+	// Explicit run loop, unlike GLUT, allows polling instead of callbacks
+	//   Probably want to add callback for rendering and RunLoop function toallow passing the responsibility off
+	//   May also want inlined C++ classexposing these as methods to allow a more OOP-like interface 
+	//
+
+	GLint MaxPatchVertices = 0;
+	glGetIntegerv(GL_MAX_PATCH_VERTICES, &MaxPatchVertices);
+	printf("Max supported patch vertices %d\n", MaxPatchVertices);
+
+	//////GENERALIZED CYLINDER//////
 	
-	barkModules.pop_back();
-	barkModules.push_back(crust2);
-	BarkStrip* barkStrip2 = new BarkStrip(barkModules);
-
-	barkModules.pop_back();
-	barkModules.push_back(crust3);
-	BarkStrip* barkStrip3 = new BarkStrip(barkModules);
-
-	std::vector<BarkStrip*> barkStrips;
-	barkStrips.push_back(barkStrip1);
-	barkStrips.push_back(barkStrip2);
-	barkStrips.push_back(barkStrip3);
-	Bark bark(8.0f, 5.0f, barkStrips);
-
-	for(int i = 0; i < 3; ++i){
-		bark.grow();
-		std::cout << i << std::endl;
-	}
-
-	Image img("../data/textures/bark_color.jpg");
+	//path
+	nv::matrix4f start, mid, end;
+	start.make_identity();
+	end.make_identity();
+	start.set_translate(nv::vec3f(0.0f,-1.0f,0.0f));
+	end.set_translate(nv::vec3f(0.0f,1.0f,0.0f));
 	
-	/////////// STRIP 1 //////////////
-
-	barkStrips = bark.getBarkStrips();
-	BarkStrip* barkStrip = barkStrips[0];
-	std::vector<unsigned> moduleTypes;
-	std::vector<float> moduleWidths;
-
-	float overallWidth = 0;
-	for(auto module : barkStrip->getBarkModules()){
-		moduleTypes.push_back(module->type());
-		float moduleWidth = module->getExtension() + module->getRestLength();
-		overallWidth += moduleWidth;
-		moduleWidths.push_back(moduleWidth);
-	}
-
-	for(int i = 0; i < moduleWidths.size(); ++i)
-		moduleWidths[i] /= overallWidth;
-		
-	unsigned int width = img.getWidth();
-	unsigned int height = img.getHeight();
-	nv::vec3f black(0.0,0.0,0.0);
-	nv::vec3f white(1.0,1.0,1.0);
-	int moduleWidth;
-	unsigned int y = 0;
-	for(int i = 0; i < moduleTypes.size(); ++i){
-		moduleWidth = height * moduleWidths[i];
-		for(int h = y; h < y + moduleWidth; ++h) {
-			for(unsigned int x = 0; x < 50; ++x){
-				if(moduleTypes[i] == 0)
-					img.setPixel(x, h, white);
-				else
-					img.setPixel(x, h, black);
-			}
-		}
-		y += moduleWidth;
-	}
-
-	////////STRIP 2////////////
-	barkStrips = bark.getBarkStrips();
-	barkStrip = barkStrips[1];
-
-	moduleTypes.clear();
-	moduleWidths.clear();
+	Path path(start);
+	path.addSegment(end);
+	path.calculate();
 	
-	overallWidth = 0;
-	for(auto module : barkStrip->getBarkModules()){
-		moduleTypes.push_back(module->type());
-		float moduleWidth = module->getExtension() + module->getRestLength();
-		overallWidth += moduleWidth;
-		moduleWidths.push_back(moduleWidth);
-	}
+	//contour
+	std::vector<nv::vec4f> temp;
+	temp.push_back(nv::vec4f(0,		0,		1,		1));
+	temp.push_back(nv::vec4f(-1,	0,		0.5,	1));
+	temp.push_back(nv::vec4f(-1,	0,		-0.5,	1));
+	temp.push_back(nv::vec4f(0,		0,		-1,		1));
+	temp.push_back(nv::vec4f(1,		0,		-0.5,	1));
+	temp.push_back(nv::vec4f(1,		0,		0.5,	1));
 
-	for(int i = 0; i < moduleWidths.size(); ++i)
-		moduleWidths[i] /= overallWidth;
-		
-	width = img.getWidth();
-	height = img.getHeight();
-	y = 0;
-	for(int i = 0; i < moduleTypes.size(); ++i){
-		moduleWidth = height * moduleWidths[i];
-		for(int h = y; h < y + moduleWidth; ++h) {
-			for(unsigned int x = 50; x < 100; ++x){
-				if(moduleTypes[i] == 0)
-					img.setPixel(x, h, white);
-				else
-					img.setPixel(x, h, black);
-			}
-		}
-		y += moduleWidth;
-	}
+	//Contour contour(temp);
+	Contour contour;
 
-	////////STRIP 3////////////
-	barkStrips = bark.getBarkStrips();
-	barkStrip = barkStrips[2];
-
-	moduleTypes.clear();
-	moduleWidths.clear();
+	//thickness
+	std::vector<float> thickness;
+	thickness.push_back(1.0f);
+	thickness.push_back(1.0f);
 	
-	overallWidth = 0;
-	for(auto module : barkStrip->getBarkModules()){
-		moduleTypes.push_back(module->type());
-		float moduleWidth = module->getExtension() + module->getRestLength();
-		overallWidth += moduleWidth;
-		moduleWidths.push_back(moduleWidth);
-	}
+	//water
+	std::vector<float> water;
+	water.push_back(1.0f);
+	water.push_back(1.0f);
 
-	for(int i = 0; i < moduleWidths.size(); ++i)
-		moduleWidths[i] /= overallWidth;
-		
-	width = img.getWidth();
-	height = img.getHeight();
-	y = 0;
-	for(int i = 0; i < moduleTypes.size(); ++i){
-		moduleWidth = height * moduleWidths[i];
-		for(int h = y; h < y + moduleWidth; ++h) {
-			for(unsigned int x = 100; x < 150; ++x){
-				if(moduleTypes[i] == 0)
-					img.setPixel(x, h, white);
-				else
-					img.setPixel(x, h, black);
-			}
-		}
-		y += moduleWidth;
-	}
+	///////////////////////////////
 
-	img.saveToFile(FIF_JPEG, "../data/textures/test.jpg");	
+	Icosahedron ico;
+	Cylinder cyl;
+	GeneralizedCylinder genCyl(path, contour, thickness, water);
+	
+	//Image img("../data/textures/bark_DISP.jpg");
 	
 	/*unsigned int width = img.getWidth();
 	unsigned int height = img.getHeight();
@@ -526,168 +476,55 @@ int main( int argc, char **argv)
 			img.setPixel(x, y, 0.5*img.getPixel(x,y) + 0.5*add);
 		}
 	}
-*/
-	/*unsigned int width = img.getWidth();
-	unsigned int height = img.getHeight();
-	nv::vec3f black(0.0,0.0,0.0);
-	nv::vec3f white(1.0,1.0,1.0);
-	int moduleWidth;
-	unsigned int x = 0;
-	for(int i = 0; i < moduleTypes.size(); ++i){
-		moduleWidth = width * moduleWidths[i];
-		for(int w = x; w < x + moduleWidth; ++w) {
-			for(unsigned int y = 0; y < 50; ++y){
-				if(moduleTypes[i] == 0)
-					img.setPixel(w, y, white);
-				else
-					img.setPixel(w, y, black);
-			}
-		}
-		x += moduleWidth;
-	}
-
-	img.saveToFile(FIF_JPEG, "../data/textures/test.jpg");	
 	*/
-	system("PAUSE");
-	//// Initialize window system portion of library (potenially refactor to have library-wide init?)
-	//nv::InitWindowSystem();
 
-	//// Create window offers no options, to more closely represent the constrained tablet environment
-	////  Window is always double-buffered with Depth
-	////  On Windows, the size defaults to 720p
-	//nv::CreateWindow();
+	//img.setTexBuffer(0);
+	//glBindTexture(GL_TEXTURE_2D, 0); //safety unbind
+	
+	Object3D obj("../data/models/cylinder_round.obj");
 
-	//// Calback function registration
-	//nv::RegisterKeydownCallback( key);
-	//nv::RegisterMouseButtonCallback( mouse);
+	float angle = 0.0f;
+	while (running)
+	{
+		// check the size every frame, to make sure the window has not been resized
+		int width, height;
+		nv::GetWindowSize( width, height);
 
-	//glewInit();
+		// clear color, dpeth, and stencil, because the UI code relies on stencil
+		glClearColor( 0.7, 0.7, 0.7, 1.0);
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//printf( "GL version %s\n", glGetString(GL_VERSION));
+		glEnable(GL_DEPTH_TEST);
 
-	//if (!glewIsSupported("GL_VERSION_4_2"))
-	//{
- //       printf("Sample requires 4.2\n");
-	//	return -1; 
-	//}
+		setUniformValues(width, height, angle);
 
-	//if (glewIsSupported("GL_ARB_shading_language_include"))
-	//	printf("Supports glsl include\n");
+		angle += 0.5f;
+		if (angle >= 360.0f)
+			angle -= 360.0f;
 
-	//init();
+		glEnable(GL_PROGRAM_POINT_SIZE_EXT);
+		glPointSize(4);
 
-	//printf( "\nCommands:\n");
-	//nv::CVarRegistry::Instance().PrintHelp();
+		glPatchParameteri(GL_PATCH_VERTICES, 3);
+		glBindVertexArray(obj.getVAO());
+		
+		glDrawElements(GL_PATCHES, obj.getIndexCount() * 3, GL_UNSIGNED_INT, 0);
 
-	////
-	//// Explicit run loop, unlike GLUT, allows polling instead of callbacks
-	////   Probably want to add callback for rendering and RunLoop function toallow passing the responsibility off
-	////   May also want inlined C++ classexposing these as methods to allow a more OOP-like interface 
-	////
+		//unbind everything
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindVertexArray(0);
+		glUseProgram(0);
 
-	//GLint MaxPatchVertices = 0;
-	//glGetIntegerv(GL_MAX_PATCH_VERTICES, &MaxPatchVertices);
-	//printf("Max supported patch vertices %d\n", MaxPatchVertices);
+		generateUI(width, height);
 
-	////////GENERALIZED CYLINDER//////
-	//
-	////path
-	//nv::matrix4f start, mid, end;
-	//start.make_identity();
-	//end.make_identity();
-	//start.set_translate(nv::vec3f(0.0f,-1.0f,0.0f));
-	//end.set_translate(nv::vec3f(0.0f,1.0f,0.0f));
-	//
-	//Path path(start);
-	//path.addSegment(end);
-	//path.calculate();
-	//
-	////contour
-	//std::vector<nv::vec4f> temp;
-	//temp.push_back(nv::vec4f(0,		0,		1,		1));
-	//temp.push_back(nv::vec4f(-1,	0,		0.5,	1));
-	//temp.push_back(nv::vec4f(-1,	0,		-0.5,	1));
-	//temp.push_back(nv::vec4f(0,		0,		-1,		1));
-	//temp.push_back(nv::vec4f(1,		0,		-0.5,	1));
-	//temp.push_back(nv::vec4f(1,		0,		0.5,	1));
+		GLenum err;
+		while ((err = glGetError()) != GL_NO_ERROR) {
+			std::cerr << "OpenGL error: " << err << std::endl;
+			exit(-2);
+		}
 
-	////Contour contour(temp);
-	//Contour contour;
-
-	////thickness
-	//std::vector<float> thickness;
-	//thickness.push_back(1.0f);
-	//thickness.push_back(1.0f);
-	//
-	////water
-	//std::vector<float> water;
-	//water.push_back(1.0f);
-	//water.push_back(1.0f);
-
-	/////////////////////////////////
-
-	//Icosahedron ico;
-	//Cylinder cyl;
-	//GeneralizedCylinder genCyl(path, contour, thickness, water);
-	//
-	////Image img("../data/textures/bark_DISP.jpg");
-	//
-	///*unsigned int width = img.getWidth();
-	//unsigned int height = img.getHeight();
-	//nv::vec3f add(0.8,0.2,0.1);
-	//for(unsigned int x = 0; x < 649; ++x){
-	//	for(unsigned int y = 0; y < 649; ++y){
-	//		img.setPixel(x, y, 0.5*img.getPixel(x,y) + 0.5*add);
-	//	}
-	//}*/
-	//
-	////img.setTexBuffer(0);
-	////glBindTexture(GL_TEXTURE_2D, 0); //safety unbind
-	//
-	////ObjFormatter obj("cylinder_right.obj");
-
-	//float angle = 0.0f;
-	//while (running)
-	//{
-	//	// check the size every frame, to make sure the window has not been resized
-	//	int width, height;
-	//	nv::GetWindowSize( width, height);
-
-	//	// clear color, dpeth, and stencil, because the UI code relies on stencil
-	//	glClearColor( 0.7, 0.7, 0.7, 1.0);
-	//	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	//	glEnable(GL_DEPTH_TEST);
-
-	//	setUniformValues(width, height, angle);
-
-	//	angle += 0.5f;
-	//	if (angle >= 360.0f)
-	//		angle -= 360.0f;
-
-	//	glEnable(GL_PROGRAM_POINT_SIZE_EXT);
-	//	glPointSize(4);
-
-	//	glPatchParameteri(GL_PATCH_VERTICES, 3);
-	//	glBindVertexArray(genCyl.getVAO());
-	//	
-	//	glDrawElements(GL_PATCHES, genCyl.getIndexCount(), GL_UNSIGNED_INT, 0);
-
-	//	//unbind everything
-	//	glBindTexture(GL_TEXTURE_2D, 0);
-	//	glBindVertexArray(0);
-	//	glUseProgram(0);
-
-	//	generateUI(width, height);
-
-	//	GLenum err;
-	//	while ((err = glGetError()) != GL_NO_ERROR) {
-	//		std::cerr << "OpenGL error: " << err << std::endl;
-	//		exit(-2);
-	//	}
-
-	//	nv::SwapBuffers();
-	//}
+		nv::SwapBuffers();
+	}
 
 	return 0; 
 }

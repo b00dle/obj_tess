@@ -52,7 +52,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\sdk_swak;..\glew\include;..\glut\include;..\glm;..\freeimage\include;include;include/bark</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\sdk_swak;..\glew\include;..\glut\include;..\glm;..\freeimage\include;include;include/bark;..\assimp\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_CONSOLE;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -71,16 +71,16 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;glut32.lib;FreeImage.lib;glew32s.lib;sdk_swak.lib</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glut32.lib;FreeImage.lib;assimp.lib;glew32s.lib;sdk_swak.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)simple_tessellation_shader.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\sdk_swak;..\glew\lib\x86;..\glut\lib;..\freeimage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\sdk_swak;..\glew\lib\x86;..\glut\lib;..\freeimage\lib;..\assimp\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <Optimization>Full</Optimization>
-      <AdditionalIncludeDirectories>..\sdk_swak;..\glew\include;..\glut\include;..\glm;..\freeimage\include;include;include/bark</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\sdk_swak;..\glew\include;..\glut\include;..\glm;..\freeimage\include;include;include/bark;..\assimp\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_CONSOLE;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
@@ -101,9 +101,9 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;glut32.lib;FreeImage.lib;glew32.lib;sdk_swak.lib</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glut32.lib;FreeImage.lib;assimp.lib;glew32.lib;sdk_swak.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)simple_tessellation_shader.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\sdk_swak;..\glew\lib\x86;..\glut\lib;..\freeimage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\sdk_swak;..\glew\lib\x86;..\glut\lib;..\freeimage\lib;..\assimp\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
@@ -128,6 +128,7 @@
     <ClCompile Include="src\icosahedron.cpp" />
     <ClCompile Include="src\Image.cpp" />
     <ClCompile Include="src\Mathlib.cpp" />
+    <ClCompile Include="src\Object3D.cpp" />
     <ClCompile Include="src\objFormatter.cpp" />
     <ClCompile Include="src\Path.cpp" />
     <ClCompile Include="src\Shader.cpp" />
@@ -147,6 +148,7 @@
     <ClInclude Include="include\icosahedron.hpp" />
     <ClInclude Include="include\Image.h" />
     <ClInclude Include="include\Mathlib.h" />
+    <ClInclude Include="include\Object3D.h" />
     <ClInclude Include="include\objFormatter.hpp" />
     <ClInclude Include="include\Path.h" />
     <ClInclude Include="include\Shader.h" />

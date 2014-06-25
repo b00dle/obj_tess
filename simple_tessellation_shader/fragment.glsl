@@ -67,7 +67,7 @@ void main() {
 			N = normalize(N + gFacetNormal);
 		}
 
-		vec3 L = light;
+		vec3 L = normalize(light);
 		float df = abs(dot(N,L));
 
 		///// compute color of material /////		
