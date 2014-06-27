@@ -16,6 +16,7 @@
 #include "Contour.h"
 #include "Image.h"
 #include "Object3D.h"
+#include "Scene3D.h"
 
 #include <list>
 #include "BarkModule.h"
@@ -27,7 +28,7 @@
 //shaders
 unsigned sProgram;
 unsigned shaderIds[5] = { 0u };
-unsigned texBufferIds[3] = { 0u };
+unsigned texBufferIds[9] = { 0u };
 
 //uniform locations
 unsigned MVPlocation		= 0;
@@ -43,9 +44,15 @@ unsigned nMappingLocation	= 0;
 unsigned texturedLocation	= 0;
 unsigned trianglesLocation	= 0;
 unsigned dfLocation			= 0;
-unsigned texDiffuseLocation	= 0;
-unsigned texHeightLocation	= 0;
-unsigned texNormalLocation	= 0;
+unsigned texDiffuseLocationY= 0; //young bark
+unsigned texHeightLocationY	= 0;
+unsigned texNormalLocationY	= 0;
+unsigned texDiffuseLocationM= 0; //mid old bark
+unsigned texHeightLocationM	= 0;
+unsigned texNormalLocationM	= 0;
+unsigned texDiffuseLocationO= 0; //old bark
+unsigned texHeightLocationO	= 0;
+unsigned texNormalLocationO	= 0;
 
 // Flag to identify when the app needs to close
 bool running = true;
@@ -207,16 +214,37 @@ void loadTexture(int tID, const char* filepath) {
 }
 
 void generateTextures() {
-	glGenTextures(3, texBufferIds);
+	glGenTextures(9, texBufferIds);
+
+	//young bark
+	glEnable(GL_TEXTURE_2D);
+	loadTexture(0,"../data/textures/bark_young/bark_young_COLOR.jpg");
 
 	glEnable(GL_TEXTURE_2D);
-	loadTexture(0,"../data/textures/face_COLOR.jpg");
+	loadTexture(1,"../data/textures/bark_young/bark_young_DISP.jpg");
 
 	glEnable(GL_TEXTURE_2D);
-	loadTexture(1,"../data/textures/face_DISP.jpg");
+	loadTexture(2,"../data/textures/bark_young/bark_young_NRM.jpg");
+
+	//middle old bark
+	glEnable(GL_TEXTURE_2D);
+	loadTexture(3,"../data/textures/bark_mid/bark_mid_COLOR.jpg");
 
 	glEnable(GL_TEXTURE_2D);
-	loadTexture(2,"../data/textures/face_NRM.jpg");
+	loadTexture(4,"../data/textures/bark_mid/bark_mid_DISP.jpg");
+
+	glEnable(GL_TEXTURE_2D);
+	loadTexture(5,"../data/textures/bark_mid/bark_mid_NRM.jpg");
+
+	//old bark
+	glEnable(GL_TEXTURE_2D);
+	loadTexture(6,"../data/textures/bark_old/bark_old_COLOR.jpg");
+
+	glEnable(GL_TEXTURE_2D);
+	loadTexture(7,"../data/textures/bark_old/bark_old_DISP.jpg");
+
+	glEnable(GL_TEXTURE_2D);
+	loadTexture(8,"../data/textures/bark_old/bark_old_NRM.jpg");
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
@@ -236,9 +264,15 @@ void setUniformLocations() {
 	texturedLocation	= glGetUniformLocation(sProgram, "textured");
 	trianglesLocation	= glGetUniformLocation(sProgram, "triangles");
 	dfLocation			= glGetUniformLocation(sProgram, "df");
-	texDiffuseLocation  = glGetUniformLocation(sProgram, "texColor");
-	texHeightLocation	= glGetUniformLocation(sProgram, "texHeight");
-	texNormalLocation	= glGetUniformLocation(sProgram, "texNormal");
+	texDiffuseLocationY = glGetUniformLocation(sProgram, "texColorYoung");
+	texHeightLocationY	= glGetUniformLocation(sProgram, "texHeightYoung");
+	texNormalLocationY	= glGetUniformLocation(sProgram, "texNormalYoung");
+	texDiffuseLocationM = glGetUniformLocation(sProgram, "texColorMid");
+	texHeightLocationM	= glGetUniformLocation(sProgram, "texHeightMid");
+	texNormalLocationM	= glGetUniformLocation(sProgram, "texNormalMid");
+	texDiffuseLocationO = glGetUniformLocation(sProgram, "texColorOld");
+	texHeightLocationO	= glGetUniformLocation(sProgram, "texHeightOld");
+	texNormalLocationO	= glGetUniformLocation(sProgram, "texNormalOld");
 }
 
 void setUniformValues(int width, int height, float angle) {
@@ -323,17 +357,45 @@ void setUniformValues(int width, int height, float angle) {
 	//glUniform1i(texHeightLocation, 0);
 
 	//nv framework binds at location 1, so textures are bound starting from location 2
+	
+	//young bark
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, texBufferIds[0]);
-	glUniform1i(texDiffuseLocation, 2);
+	glUniform1i(texDiffuseLocationY, 2);
 
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, texBufferIds[1]);
-	glUniform1i(texHeightLocation, 3);
+	glUniform1i(texHeightLocationY, 3);
 
 	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, texBufferIds[2]);
-	glUniform1i(texNormalLocation, 4);
+	glUniform1i(texNormalLocationY, 4);
+
+	//mid old bark
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, texBufferIds[3]);
+	glUniform1i(texDiffuseLocationM, 5);
+
+	glActiveTexture(GL_TEXTURE6);
+	glBindTexture(GL_TEXTURE_2D, texBufferIds[4]);
+	glUniform1i(texHeightLocationM, 6);
+
+	glActiveTexture(GL_TEXTURE7);
+	glBindTexture(GL_TEXTURE_2D, texBufferIds[5]);
+	glUniform1i(texNormalLocationM, 7);
+
+	//old bark
+	glActiveTexture(GL_TEXTURE8);
+	glBindTexture(GL_TEXTURE_2D, texBufferIds[6]);
+	glUniform1i(texDiffuseLocationO, 8);
+
+	glActiveTexture(GL_TEXTURE9);
+	glBindTexture(GL_TEXTURE_2D, texBufferIds[7]);
+	glUniform1i(texHeightLocationO, 9);
+
+	glActiveTexture(GL_TEXTURE10);
+	glBindTexture(GL_TEXTURE_2D, texBufferIds[8]);
+	glUniform1i(texNormalLocationO, 10);
 }
 
 void init()
@@ -453,7 +515,7 @@ int main( int argc, char **argv)
 	//thickness
 	std::vector<float> thickness;
 	thickness.push_back(1.0f);
-	thickness.push_back(1.0f);
+	thickness.push_back(0.5f);
 	
 	//water
 	std::vector<float> water;
@@ -481,7 +543,7 @@ int main( int argc, char **argv)
 	//img.setTexBuffer(0);
 	//glBindTexture(GL_TEXTURE_2D, 0); //safety unbind
 	
-	Object3D obj("../data/models/cylinder_round.obj");
+	Scene3D scene("../data/models/cylinder_round.obj");
 
 	float angle = 0.0f;
 	while (running)
@@ -506,9 +568,9 @@ int main( int argc, char **argv)
 		glPointSize(4);
 
 		glPatchParameteri(GL_PATCH_VERTICES, 3);
-		glBindVertexArray(obj.getVAO());
+		glBindVertexArray(genCyl.getVAO());
 		
-		glDrawElements(GL_PATCHES, obj.getIndexCount() * 3, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_PATCHES, genCyl.getIndexCount(), GL_UNSIGNED_INT, 0);
 
 		//unbind everything
 		glBindTexture(GL_TEXTURE_2D, 0);

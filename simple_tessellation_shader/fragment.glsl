@@ -7,14 +7,22 @@ in vec3 gTriDistance;
 in vec3 gPatchDistance;
 in vec2 gTexCoord;
 in vec3 gPosition;
+in float gAge;
 
 uniform float lit;
 uniform float nMapping;
 uniform float textured;
 uniform float triangles;
 uniform vec3 light;
-uniform sampler2D texColor;
-uniform sampler2D texNormal;
+
+uniform sampler2D texColorYoung;
+uniform sampler2D texNormalYoung;
+
+uniform sampler2D texColorMid;
+uniform sampler2D texNormalMid;
+
+uniform sampler2D texColorOld;
+uniform sampler2D texNormalOld;
 
 float amplify(float d, float scale, float offset) {
 	d = scale * d + offset;
@@ -63,7 +71,8 @@ void main() {
 
 		if(nMapping > 0.5) {
 			mat3 texSpaceMat = computeTextureSpaceMatrix();
-			N = texSpaceMat * normalize( texture(texNormal, gTexCoord).rgb * 2.0 - 1.0 );
+			vec3 normalLookup = gAge *  ( texture(texNormalMid, gTexCoord).rgb * 2.0 - 1.0 ) + (1-gAge) * ( texture(texNormalYoung, gTexCoord).rgb * 2.0 - 1.0 ); 
+			N = texSpaceMat * normalize(normalLookup);
 			N = normalize(N + gFacetNormal);
 		}
 
@@ -71,8 +80,9 @@ void main() {
 		float df = abs(dot(N,L));
 
 		///// compute color of material /////		
-		if(textured > 0.5)
-			color = texture(texColor, gTexCoord).xyz; 
+		if(textured > 0.5) {
+			color = gAge * texture(texColorMid, gTexCoord).xyz + (1-gAge) * texture(texColorYoung, gTexCoord).xyz;
+		}
 		color = df * color;
 
 		///// show triangle edges /////

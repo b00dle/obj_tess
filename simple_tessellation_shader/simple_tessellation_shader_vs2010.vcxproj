@@ -52,7 +52,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\sdk_swak;..\glew\include;..\glut\include;..\glm;..\freeimage\include;include;include/bark;..\assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\sdk_swak;..\glew\include;..\glut\include;..\glm;..\freeimage\include;include;include\bark;..\assimp\include;include\geometry</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_CONSOLE;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -80,7 +80,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <Optimization>Full</Optimization>
-      <AdditionalIncludeDirectories>..\sdk_swak;..\glew\include;..\glut\include;..\glm;..\freeimage\include;include;include/bark;..\assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\sdk_swak;..\glew\include;..\glut\include;..\glm;..\freeimage\include;include;include\bark;..\assimp\include;include\geometry</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_CONSOLE;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
@@ -121,16 +121,17 @@
     <ClCompile Include="src\bark\BarkTexGenerator.cpp" />
     <ClCompile Include="src\bark\Crust.cpp" />
     <ClCompile Include="src\bark\Fracture.cpp" />
-    <ClCompile Include="src\Bezierpath.cpp" />
-    <ClCompile Include="src\Contour.cpp" />
-    <ClCompile Include="src\cylinder.cpp" />
-    <ClCompile Include="src\GeneralizedCylinder.cpp" />
-    <ClCompile Include="src\icosahedron.cpp" />
+    <ClCompile Include="src\geometry\Bezierpath.cpp" />
+    <ClCompile Include="src\geometry\Contour.cpp" />
+    <ClCompile Include="src\geometry\cylinder.cpp" />
+    <ClCompile Include="src\geometry\GeneralizedCylinder.cpp" />
+    <ClCompile Include="src\geometry\icosahedron.cpp" />
+    <ClCompile Include="src\geometry\Object3D.cpp" />
+    <ClCompile Include="src\geometry\Path.cpp" />
+    <ClCompile Include="src\geometry\Scene3D.cpp" />
     <ClCompile Include="src\Image.cpp" />
     <ClCompile Include="src\Mathlib.cpp" />
-    <ClCompile Include="src\Object3D.cpp" />
     <ClCompile Include="src\objFormatter.cpp" />
-    <ClCompile Include="src\Path.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\simple_tessellation_shader.cpp" />
   </ItemGroup>
@@ -141,16 +142,17 @@
     <ClInclude Include="include\bark\BarkStrip.h" />
     <ClInclude Include="include\bark\Crust.h" />
     <ClInclude Include="include\bark\Fracture.h" />
-    <ClInclude Include="include\Bezierpath.h" />
-    <ClInclude Include="include\Contour.h" />
-    <ClInclude Include="include\cylinder.hpp" />
-    <ClInclude Include="include\GeneralizedCylinder.h" />
-    <ClInclude Include="include\icosahedron.hpp" />
+    <ClInclude Include="include\geometry\Bezierpath.h" />
+    <ClInclude Include="include\geometry\Contour.h" />
+    <ClInclude Include="include\geometry\cylinder.hpp" />
+    <ClInclude Include="include\geometry\GeneralizedCylinder.h" />
+    <ClInclude Include="include\geometry\icosahedron.hpp" />
+    <ClInclude Include="include\geometry\Object3D.h" />
+    <ClInclude Include="include\geometry\Path.h" />
+    <ClInclude Include="include\geometry\Scene3D.h" />
     <ClInclude Include="include\Image.h" />
     <ClInclude Include="include\Mathlib.h" />
-    <ClInclude Include="include\Object3D.h" />
     <ClInclude Include="include\objFormatter.hpp" />
-    <ClInclude Include="include\Path.h" />
     <ClInclude Include="include\Shader.h" />
     <ClInclude Include="include\uniforms.h" />
   </ItemGroup>

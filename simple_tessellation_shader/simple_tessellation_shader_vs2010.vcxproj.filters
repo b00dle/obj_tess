@@ -16,6 +16,12 @@
     <Filter Include="Source Files\bark">
       <UniqueIdentifier>{bed500b9-5cd5-4c09-b9d5-44c55d835fe4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\geometry">
+      <UniqueIdentifier>{1dc32088-b915-4125-ae51-1cd565bfa2db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\geometry">
+      <UniqueIdentifier>{a7e9d0d1-8914-428b-a689-1fd6cde0ce77}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="vertex.glsl">
@@ -35,12 +41,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\cylinder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\icosahedron.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\objFormatter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -48,18 +48,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\simple_tessellation_shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Contour.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GeneralizedCylinder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Path.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Bezierpath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Mathlib.cpp">
@@ -86,17 +74,32 @@
     <ClCompile Include="src\bark\BarkTexGenerator.cpp">
       <Filter>Source Files\bark</Filter>
     </ClCompile>
-    <ClCompile Include="src\Object3D.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\geometry\Bezierpath.cpp">
+      <Filter>Source Files\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\geometry\Contour.cpp">
+      <Filter>Source Files\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\geometry\cylinder.cpp">
+      <Filter>Source Files\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\geometry\GeneralizedCylinder.cpp">
+      <Filter>Source Files\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\geometry\icosahedron.cpp">
+      <Filter>Source Files\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\geometry\Object3D.cpp">
+      <Filter>Source Files\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\geometry\Path.cpp">
+      <Filter>Source Files\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\geometry\Scene3D.cpp">
+      <Filter>Source Files\geometry</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\cylinder.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\icosahedron.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\objFormatter.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -104,18 +107,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\uniforms.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Contour.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GeneralizedCylinder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Path.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Bezierpath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Mathlib.h">
@@ -142,8 +133,29 @@
     <ClInclude Include="include\BarkTexGenerator.h">
       <Filter>Header Files\bark</Filter>
     </ClInclude>
-    <ClInclude Include="include\Object3D.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\geometry\Bezierpath.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\geometry\Contour.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\geometry\cylinder.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\geometry\GeneralizedCylinder.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\geometry\icosahedron.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\geometry\Object3D.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\geometry\Path.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\geometry\Scene3D.h">
+      <Filter>Header Files\geometry</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

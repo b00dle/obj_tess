@@ -5,17 +5,21 @@ layout(triangles, equal_spacing, ccw) in;
 in vec3 tcPosition[];
 in vec3 tcNormal[];
 in vec2 tcTexCoord[];
+in float tcAge[];
 out vec3 tePosition;
 out vec3 tePatchDistance;
 out vec2 teTexCoord;
 out vec3 teNormal;
+out float teAge;
 
 uniform mat4 ModelViewProjection;
 uniform mat4 ModelView;
 uniform float df;
 uniform float dMapping;
 	
-uniform sampler2D texHeight;
+uniform sampler2D texHeightYoung;
+uniform sampler2D texHeightMid;
+uniform sampler2D texHeightOld;
 
 void main(){
 	vec3 p0 = gl_TessCoord.x * tcPosition[0];
@@ -33,10 +37,14 @@ void main(){
 	vec2 tc2 = gl_TessCoord.z * tcTexCoord[2];	
 	teTexCoord = tc0 + tc1 + tc2;
 
-	vec2 texCoord = teTexCoord;
-	
+	float a0 = gl_TessCoord.x * tcAge[0];
+	float a1 = gl_TessCoord.y * tcAge[1];
+	float a2 = gl_TessCoord.z * tcAge[2];	
+	teAge = a0 + a1 + a2;
+
 	if(dMapping > 0.5){
-		float height = texture(texHeight, teTexCoord).x;
+		float height;
+		height = teAge * texture(texHeightMid, teTexCoord).x + (1 - teAge) * texture(texHeightYoung, teTexCoord).x;
 		pos += normal * (height * df);
 	}
 
