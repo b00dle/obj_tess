@@ -19,7 +19,7 @@ public:
 
 	//C'tor
 	GeneralizedCylinder();
-	GeneralizedCylinder(Path const&, Contour const&, std::vector<float> const&, std::vector<float> const&, int = 0);
+	GeneralizedCylinder(Path const&, Contour const&, std::vector<float> const&, std::vector<float> const&, std::vector<float> const&, int = 0);
 
 	//Getter
 	std::vector<nv::vec3f>*    vertices();	

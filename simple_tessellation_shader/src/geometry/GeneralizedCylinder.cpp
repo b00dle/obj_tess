@@ -4,7 +4,7 @@
 GeneralizedCylinder::GeneralizedCylinder(): mVertices(),mIndices()
 {}
 
-GeneralizedCylinder::GeneralizedCylinder(Path const& b , Contour const& c, std::vector<float> const& dicken,std::vector<float> const& water, int off): 
+GeneralizedCylinder::GeneralizedCylinder(Path const& b , Contour const& c, std::vector<float> const& dicken, std::vector<float> const& water, std::vector<float> const& ages, int off): 
 	mBezierPath(b), 
 	mContour(c),
 	mRadii(dicken),
@@ -33,7 +33,7 @@ GeneralizedCylinder::GeneralizedCylinder(Path const& b , Contour const& c, std::
 			nv::vec4f temp;
 			temp = motion* scaleMatrix* mContour.Bezierpoint(j);
 
-			mAge.push_back(dicke);
+			mAge.push_back(ages[i]);
 			mVertices.push_back(nv::vec3f(temp));
 
 		}

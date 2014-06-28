@@ -21,6 +21,30 @@ uniform sampler2D texHeightYoung;
 uniform sampler2D texHeightMid;
 uniform sampler2D texHeightOld;
 
+float computeHeight() {
+/*
+	dc = displacement coefficient (based on age and growth stage)
+	df = fixed displacement factor (uniform param)
+	tf = transition factor (for interpolating between bark ages)
+*/
+	float dc = 0.0;
+	float tf = 0.0;
+	if(teAge < 0.25) {
+		dc = teAge / 0.25;
+		return dc * 0.33 * df * texture(texHeightYoung, teTexCoord).x;
+	}
+	else if(teAge < 0.75) {
+		dc = teAge / 0.75;
+		tf = min( (teAge-0.25) / 0.25 , 1.0 ); //only influences a premature midgrowth stage 0.25 < age < 0.5
+		return df * (dc * tf * 0.66 * texture(texHeightMid, teTexCoord).x + (1-tf) * 0.33 * texture(texHeightYoung, teTexCoord).x);
+	}
+	else {
+		dc = min( (teAge/1.0) , 1.0 );
+		tf = min( (teAge-0.75) / 0.25 , 1.0 );
+		return df * (dc * tf * texture(texHeightOld, teTexCoord).x + (1-tf) * 0.66 * texture(texHeightMid, teTexCoord).x);
+	}
+}
+
 void main(){
 	vec3 p0 = gl_TessCoord.x * tcPosition[0];
 	vec3 p1 = gl_TessCoord.y * tcPosition[1];
@@ -43,9 +67,8 @@ void main(){
 	teAge = a0 + a1 + a2;
 
 	if(dMapping > 0.5){
-		float height;
-		height = teAge * texture(texHeightMid, teTexCoord).x + (1 - teAge) * texture(texHeightYoung, teTexCoord).x;
-		pos += normal * (height * df);
+		float height = computeHeight();
+		pos += normal * height;
 	}
 
 	gl_Position = ModelViewProjection * vec4(pos, 1);

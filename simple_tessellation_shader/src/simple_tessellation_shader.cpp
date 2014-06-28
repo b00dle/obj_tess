@@ -28,7 +28,7 @@
 //shaders
 unsigned sProgram;
 unsigned shaderIds[5] = { 0u };
-unsigned texBufferIds[9] = { 0u };
+unsigned texBufferIds[12] = { 0u };
 
 //uniform locations
 unsigned MVPlocation		= 0;
@@ -53,6 +53,7 @@ unsigned texNormalLocationM	= 0;
 unsigned texDiffuseLocationO= 0; //old bark
 unsigned texHeightLocationO	= 0;
 unsigned texNormalLocationO	= 0;
+unsigned texArrayLocation	= 0;
 
 // Flag to identify when the app needs to close
 bool running = true;
@@ -213,6 +214,52 @@ void loadTexture(int tID, const char* filepath) {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void loadTexArray(int tID, std::vector<const char*> filepaths) {
+	if(filepaths.size() < 2){
+		std::cout << "Error!!! A texture array needs to contain at least 2 textures.\n";
+		return;
+	}
+
+	FreeImage_Initialise();
+	FIBITMAP* _bitmap;
+
+	_bitmap = FreeImage_Load(FreeImage_GetFileType(filepaths[0], 0),
+							 filepaths[0]);
+
+	glEnable(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, texBufferIds[tID]);
+
+	glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glTexImage3D(GL_TEXTURE_2D_ARRAY,
+				 0, GL_RGB,
+				 FreeImage_GetWidth(_bitmap),
+				 FreeImage_GetHeight(_bitmap),
+				 filepaths.size(), //depth
+				 0, GL_RGB,
+				 GL_UNSIGNED_BYTE,
+				 NULL
+	);
+	
+	for(int i = 0; i < filepaths.size(); ++i) {
+		_bitmap = FreeImage_Load(FreeImage_GetFileType(filepaths[i], 0), filepaths[i]);
+		unsigned char* pixelData = FreeImage_GetBits(_bitmap);
+
+		glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
+						0, 0,
+						0, i,
+						FreeImage_GetWidth(_bitmap),
+						FreeImage_GetHeight(_bitmap),
+						1, GL_RGB, GL_UNSIGNED_BYTE,
+						pixelData
+		);
+	}
+}
+
 void generateTextures() {
 	glGenTextures(9, texBufferIds);
 
@@ -246,6 +293,12 @@ void generateTextures() {
 	glEnable(GL_TEXTURE_2D);
 	loadTexture(8,"../data/textures/bark_old/bark_old_NRM.jpg");
 
+	std::vector<const char*> filepaths;
+	filepaths.push_back("../data/textures/bark_old/bark_old_COLOR.jpg");
+	filepaths.push_back("../data/textures/bark_old/bark_old_DISP.jpg");
+	filepaths.push_back("../data/textures/bark_old/bark_old_NRM.jpg");
+	loadTexArray(9, filepaths);
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -273,6 +326,7 @@ void setUniformLocations() {
 	texDiffuseLocationO = glGetUniformLocation(sProgram, "texColorOld");
 	texHeightLocationO	= glGetUniformLocation(sProgram, "texHeightOld");
 	texNormalLocationO	= glGetUniformLocation(sProgram, "texNormalOld");
+	texArrayLocation	= glGetUniformLocation(sProgram, "texArray");
 }
 
 void setUniformValues(int width, int height, float angle) {
@@ -396,6 +450,10 @@ void setUniformValues(int width, int height, float angle) {
 	glActiveTexture(GL_TEXTURE10);
 	glBindTexture(GL_TEXTURE_2D, texBufferIds[8]);
 	glUniform1i(texNormalLocationO, 10);
+
+	glActiveTexture(GL_TEXTURE11);
+	glBindTexture(GL_TEXTURE_2D, texBufferIds[9]);
+	glUniform1i(texArrayLocation, 11);
 }
 
 void init()
@@ -490,14 +548,14 @@ int main( int argc, char **argv)
 	//////GENERALIZED CYLINDER//////
 	
 	//path
-	nv::matrix4f start, mid, end;
-	start.make_identity();
-	end.make_identity();
-	start.set_translate(nv::vec3f(0.0f,-1.0f,0.0f));
-	end.set_translate(nv::vec3f(0.0f,1.0f,0.0f));
+	nv::matrix4f p0, p1;
+	p0.make_identity();
+	p1.make_identity();
+	p0.set_translate(nv::vec3f(0.0f,-1.0f,0.0f));
+	p1.set_translate(nv::vec3f(0.0f,1.0f,0.0f));
 	
-	Path path(start);
-	path.addSegment(end);
+	Path path(p0);
+	path.addSegment(p1);
 	path.calculate();
 	
 	//contour
@@ -514,19 +572,24 @@ int main( int argc, char **argv)
 
 	//thickness
 	std::vector<float> thickness;
-	thickness.push_back(1.0f);
-	thickness.push_back(0.5f);
+	thickness.push_back(0.6f);
+	thickness.push_back(0.3f);
 	
 	//water
 	std::vector<float> water;
 	water.push_back(1.0f);
 	water.push_back(1.0f);
 
+	//water
+	std::vector<float> ages;
+	ages.push_back(1.0f);
+	ages.push_back(0.0f);
+
 	///////////////////////////////
 
 	Icosahedron ico;
 	Cylinder cyl;
-	GeneralizedCylinder genCyl(path, contour, thickness, water);
+	GeneralizedCylinder genCyl(path, contour, thickness, water, ages);
 	
 	//Image img("../data/textures/bark_DISP.jpg");
 	

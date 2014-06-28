@@ -14,5 +14,5 @@ void main() {
 	vPosition	= vertex.xyz;
 	vNormal		= normal.xyz;
 	vTexCoord	= texCoord;
-	vAge		= age - 0.4;
+	vAge		= age;
 }

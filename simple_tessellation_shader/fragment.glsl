@@ -1,4 +1,5 @@
 #version 430
+#extension GL_EXT_texture_array : enable
 
 layout(location = 0) out vec4 fragColor;
 
@@ -23,6 +24,8 @@ uniform sampler2D texNormalMid;
 
 uniform sampler2D texColorOld;
 uniform sampler2D texNormalOld;
+
+uniform sampler2DArray texArray;
 
 float amplify(float d, float scale, float offset) {
 	d = scale * d + offset;
@@ -58,6 +61,25 @@ mat3 computeTextureSpaceMatrix(void) {
 	return mat3(t, b, n); //TextureSpaceMatrix
 }
 
+vec3 computeTexValue(bool normalTex) {
+/*
+	tf = transition factor (for interpolating between bark ages)
+*/
+	float tf = 0.0;
+	if(gAge < 0.25)
+		return normalTex ? texture(texNormalYoung, gTexCoord).rgb * 2.0 - 1.0 : texture(texColorYoung, gTexCoord).rgb;
+	
+	else if(gAge < 0.75) {
+		tf = min( (gAge-0.25) / 0.25 , 1.0 ); //only influences a premature midgrowth stage 0.25 < age < 0.5
+		return normalTex ? (tf * texture(texNormalMid, gTexCoord).rgb + (1-tf) * texture(texNormalYoung, gTexCoord).rgb) * 2.0 - 1.0 :
+							tf * texture(texColorMid, gTexCoord).rgb + (1-tf) * texture(texColorYoung, gTexCoord).rgb;
+	}
+	else {
+		tf = min( (gAge-0.75) / 0.25 , 1.0 );
+		return normalTex ? (tf * texture(texNormalOld, gTexCoord).rgb + (1-tf) * texture(texNormalMid, gTexCoord).rgb) * 2.0 - 1.0 :
+							tf * texture(texColorOld, gTexCoord).rgb + (1-tf) * texture(texColorMid, gTexCoord).rgb;
+	}
+}
 
 void main() {
 	#ifndef ORANGE_PURPLE
@@ -71,18 +93,20 @@ void main() {
 
 		if(nMapping > 0.5) {
 			mat3 texSpaceMat = computeTextureSpaceMatrix();
-			vec3 normalLookup = gAge *  ( texture(texNormalMid, gTexCoord).rgb * 2.0 - 1.0 ) + (1-gAge) * ( texture(texNormalYoung, gTexCoord).rgb * 2.0 - 1.0 ); 
+			vec3 normalLookup = computeTexValue(true); 
 			N = texSpaceMat * normalize(normalLookup);
 			N = normalize(N + gFacetNormal);
 		}
 
 		vec3 L = normalize(light);
-		float df = abs(dot(N,L));
+		float df = abs(dot(N,L)); //diffuse factor
 
 		///// compute color of material /////		
 		if(textured > 0.5) {
-			color = gAge * texture(texColorMid, gTexCoord).xyz + (1-gAge) * texture(texColorYoung, gTexCoord).xyz;
+			color = computeTexValue(false);
+			//color = texture2DArray(texArray, vec3(gTexCoord, 0)).xyz;
 		}
+		
 		color = df * color;
 
 		///// show triangle edges /////
