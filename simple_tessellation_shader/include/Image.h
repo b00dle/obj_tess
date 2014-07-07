@@ -19,6 +19,7 @@ class Image {
 		void				setPixel(int, int, nv::vec3f const&);
 		void				setPixel(int, int, float, float, float);
 		void				setTexBuffer(unsigned);
+		bool				scale(unsigned int, unsigned int);
 
 		bool				saveToFile(FREE_IMAGE_FORMAT, const char*);
 

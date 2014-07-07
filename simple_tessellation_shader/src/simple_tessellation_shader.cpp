@@ -17,6 +17,7 @@
 #include "Image.h"
 #include "Object3D.h"
 #include "Scene3D.h"
+#include "DSTexture.h"
 
 #include <list>
 #include "BarkModule.h"
@@ -589,8 +590,16 @@ int main( int argc, char **argv)
 
 	Icosahedron ico;
 	Cylinder cyl;
+	
 	GeneralizedCylinder genCyl(path, contour, thickness, water, ages);
 	
+	Image* img = new Image("../data/textures/bark_young/bark_young_COLOR.jpg");
+	//img->scale(100,100);
+	//img->saveToFile(FIF_JPEG, "../data/textures/bark_young/copy.jpg");
+	DSTexture tex(img);
+	tex.halfSize();
+	tex.saveToFile(FIF_JPEG, "../data/textures/bark_young/copy.jpg");
+
 	//Image img("../data/textures/bark_DISP.jpg");
 	
 	/*unsigned int width = img.getWidth();

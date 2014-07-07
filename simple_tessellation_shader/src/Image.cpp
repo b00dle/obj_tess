@@ -65,6 +65,26 @@ void Image::setTexBuffer(unsigned tbID) {
 		std::cout << "error while creating texture buffer\n";
 }
 
+bool Image::scale(unsigned int w, unsigned int h) {
+	if(updateBitmap()) {
+		_bitmap = FreeImage_Rescale(_bitmap, w, h, FILTER_BILINEAR);
+		if(_bitmap) {
+			_width  = FreeImage_GetWidth(_bitmap);
+			_height = FreeImage_GetHeight(_bitmap);
+			_pitch  = FreeImage_GetPitch(_bitmap);
+			return storePixelValues();
+		}
+		else {
+			std::cout << "ERROR scaling image\n";
+			return false;
+		}
+	}
+	else {
+		std::cout << "ERROR updating bitmap\n";
+		return false;
+	}
+}
+
 bool Image::saveToFile(FREE_IMAGE_FORMAT format, const char* filepath) {
 	if(updateBitmap()) {
 		FIBITMAP* _b = FreeImage_ToneMapping(_bitmap, FITMO_REINHARD05); //convert RGBF to bitmap
@@ -105,6 +125,12 @@ bool Image::init() {
 }
 
 bool Image::storePixelValues() {
+	if(_pixelValues.size() > 0) {
+		for(auto column : _pixelValues)
+			column.clear();
+		_pixelValues.clear();
+	}
+
 	_pixelValues.resize(_width);
 	for(unsigned int column = 0; column < _width; ++column)
 		_pixelValues[column].resize(_height, nullptr);
