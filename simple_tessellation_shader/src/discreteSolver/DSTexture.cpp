@@ -18,7 +18,7 @@ DSTexture::DSTexture():
 	}
 }
 
-DSTexture::DSTexture(nv::vec2ui dimensions):
+DSTexture::DSTexture(nv::vec2i dimensions):
 	_size(dimensions.x, dimensions.y),
 	_pixels(),
 	_image(nullptr)
@@ -44,7 +44,7 @@ DSTexture::DSTexture(Image* imageInput):
 	}        
 }
 
-DSTexture::DSTexture(nv::vec2ui startPoint, nv::vec2ui dimensions, DSTexture& input):
+DSTexture::DSTexture(nv::vec2i startPoint, nv::vec2i dimensions, DSTexture const& input):
 	_size(dimensions.x, dimensions.y),
 	_pixels(),
 	_image(nullptr)
@@ -52,8 +52,8 @@ DSTexture::DSTexture(nv::vec2ui startPoint, nv::vec2ui dimensions, DSTexture& in
     _pixels.resize(_size.x);
 	for(unsigned int column = 0; column < _size.x; ++column) {
 		_pixels[column].resize(_size.y, nullptr);
-		for(auto p : _pixels[column])
-			p = new nv::vec3f(0.0f,0.0f,0.0f);
+		for(int row = 0; row < _pixels[column].size(); ++row)
+			_pixels[column][row] = new nv::vec3f(0.0f,0.0f,0.0f);
 	}
 	
 	for(unsigned int row = 0; row < _size.y ; ++row) {
@@ -65,6 +65,23 @@ DSTexture::DSTexture(nv::vec2ui startPoint, nv::vec2ui dimensions, DSTexture& in
 }
 
 //////////////////////////////////////////////////////////////////
+
+nv::vec2i const& DSTexture::getSize() const {
+	return _size;
+}
+
+std::vector<std::vector<nv::vec3f*>> const& DSTexture::getPixels() const {
+	return _pixels;
+}
+
+Image const DSTexture::getImage() const {
+	return *_image;
+}
+
+void DSTexture::setPixel(int x, int y, nv::vec3f const& value) {
+	delete _pixels[x][y];
+	_pixels[x][y] = new nv::vec3f(value);
+}
 
 void DSTexture::clearPixelValues() {
 	for(auto col: _pixels){
@@ -165,7 +182,7 @@ int DSTexture::euclideanDistanceSquared(DSTexture const& tex) const {
 	return red + blue + green;
 }
 
-int DSTexture::euclideanDistanceSquared(nv::vec2ui const& inPixel, DSTexture const& compTexture, nv::vec2ui const& compPixel) const {
+int DSTexture::euclideanDistanceSquared(nv::vec2i const& inPixel, DSTexture const& compTexture, nv::vec2i const& compPixel) const {
 	int red = 0, green = 0, blue = 0;
 
 	int distRed		= (int) ( 255 * (_pixels[inPixel.x][inPixel.y]->x - compTexture._pixels[compPixel.x][compPixel.y]->x) );
@@ -179,7 +196,7 @@ int DSTexture::euclideanDistanceSquared(nv::vec2ui const& inPixel, DSTexture con
 	return red + blue + green;
 }
 
-int DSTexture::euclideanDistanceSquaredNeighbourhood(nv::vec2ui const& inPoint, DSTexture const& compTexture, nv::vec2ui const& compPoint, int neighbourSize) const {
+int DSTexture::euclideanDistanceSquaredNeighbourhood(nv::vec2i const& inPoint, DSTexture const& compTexture, nv::vec2i const& compPoint, int neighbourSize) const {
 	int red = 0, green = 0, blue = 0;
 	int numPixels = 0;
 
@@ -214,7 +231,7 @@ int DSTexture::euclideanDistanceSquaredNeighbourhood(nv::vec2ui const& inPoint, 
 	return red + green + blue;
 }
 
-int DSTexture::euclideanDistanceSquaredNeighbourhoodWrap(nv::vec2ui const& inPoint, DSTexture const& compTexture, nv::vec2ui const& compPoint, int neighbourSize) const {
+int DSTexture::euclideanDistanceSquaredNeighbourhoodWrap(nv::vec2i const& inPoint, DSTexture const& compTexture, nv::vec2i const& compPoint, int neighbourSize) const {
 	int red = 0, green = 0, blue = 0;
 	int numPixels = 0;
 
@@ -249,11 +266,11 @@ int DSTexture::euclideanDistanceSquaredNeighbourhoodWrap(nv::vec2ui const& inPoi
 	return red + green + blue;
 }
 
-nv::vec2ui const DSTexture::findClosestNeighbourhood(DSTexture const& compTexture, nv::vec2ui& compPoint, int neighbourSize) const {
-	nv::vec2ui closestPoint;
+nv::vec2i const DSTexture::findClosestNeighbourhood(DSTexture const& compTexture, nv::vec2i& compPoint, int neighbourSize) const {
+	nv::vec2i closestPoint;
 	int closestDist = 10000000;
 
-	nv::vec2ui currentPoint;
+	nv::vec2i currentPoint;
 	int currentDist = 0;
 	unsigned int neighbourIncrement = (unsigned int) ( (2*neighbourSize + 1) / 4 );
 
@@ -273,8 +290,8 @@ nv::vec2ui const DSTexture::findClosestNeighbourhood(DSTexture const& compTextur
 }
 
 void DSTexture::halfSize() {
-	nv::vec2ui sizeTemp = _size;
-	sizeTemp = (nv::vec2ui) sizeTemp/2;
+	nv::vec2i sizeTemp = _size;
+	sizeTemp = (nv::vec2i) sizeTemp/2;
 
 	std::vector<std::vector<nv::vec3f*>> pixelsTemp;
 	pixelsTemp.resize(sizeTemp.x);
@@ -324,6 +341,9 @@ void DSTexture::halfSize() {
 	_pixels = pixelsTemp;
 	_size = sizeTemp;
 	_image->scale(_size.x, _size.y);
-	_image->saveToFile(FIF_JPEG,"../data/textures/bark_young/copy2.jpg");
+}
+
+void DSTexture::scaleImage(unsigned int w, unsigned int h) {
+	_image->scale(w,h);
 }
         

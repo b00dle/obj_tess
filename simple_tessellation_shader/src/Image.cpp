@@ -18,6 +18,25 @@ Image::Image(const char* filepath):
 	}
 }
 
+Image::Image(Image const& image):
+	_filepath(image._filepath),
+	_bitmap(nullptr),//new FIBITMAP(*image._bitmap)
+	_width(image._width),
+	_height(image._height),
+	_pitch(image._pitch),
+	_pixelValues(),
+	_tBufferID(),
+	_doneTBufferInit(false)
+{
+	_bitmap = new FIBITMAP(*image._bitmap);
+	_pixelValues.resize(image._pixelValues.size());
+	for(int x = 0; x < _pixelValues.size(); ++x) {
+		_pixelValues[x].resize(image._pixelValues[x].size(), nullptr);
+		for(int y = 0; y < _pixelValues[x].size(); ++y)
+			_pixelValues[x][y] = new nv::vec3f(*image._pixelValues[x][y]);
+	}
+}
+
 Image::~Image()
 {}
 

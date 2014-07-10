@@ -107,6 +107,18 @@
     <ClCompile Include="src\discreteSolver\DSTexture.cpp">
       <Filter>Source Files\discreteSolver</Filter>
     </ClCompile>
+    <ClCompile Include="src\discreteSolver\DSCoherentTexture.cpp">
+      <Filter>Source Files\discreteSolver</Filter>
+    </ClCompile>
+    <ClCompile Include="src\discreteSolver\DSIndexedTexture.cpp">
+      <Filter>Source Files\discreteSolver</Filter>
+    </ClCompile>
+    <ClCompile Include="src\discreteSolver\DSPixelCoherence.cpp">
+      <Filter>Source Files\discreteSolver</Filter>
+    </ClCompile>
+    <ClCompile Include="include\discreteSolver\DSTextureSynthesis.cpp">
+      <Filter>Source Files\discreteSolver</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\objFormatter.hpp">
@@ -167,6 +179,24 @@
       <Filter>Header Files\geometry</Filter>
     </ClInclude>
     <ClInclude Include="include\discreteSolver\DSTexture.h">
+      <Filter>Header Files\discreteSolver</Filter>
+    </ClInclude>
+    <ClInclude Include="include\discreteSolver\DSIndexedTexture.h">
+      <Filter>Header Files\discreteSolver</Filter>
+    </ClInclude>
+    <ClInclude Include="include\discreteSolver\DSPixelCoherence.h">
+      <Filter>Header Files\discreteSolver</Filter>
+    </ClInclude>
+    <ClInclude Include="include\discreteSolver\DSPixel.h">
+      <Filter>Header Files\discreteSolver</Filter>
+    </ClInclude>
+    <ClInclude Include="include\discreteSolver\DSComparePixel.h">
+      <Filter>Header Files\discreteSolver</Filter>
+    </ClInclude>
+    <ClInclude Include="include\discreteSolver\DSCoherentTexture.h">
+      <Filter>Header Files\discreteSolver</Filter>
+    </ClInclude>
+    <ClInclude Include="include\discreteSolver\DSTextureSynthesis.h">
       <Filter>Header Files\discreteSolver</Filter>
     </ClInclude>
   </ItemGroup>

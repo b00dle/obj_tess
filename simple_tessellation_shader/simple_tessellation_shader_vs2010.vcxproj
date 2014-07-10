@@ -115,12 +115,16 @@
     <None Include="vertex.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\discreteSolver\DSTextureSynthesis.cpp" />
     <ClCompile Include="src\bark\Bark.cpp" />
     <ClCompile Include="src\bark\BarkModule.cpp" />
     <ClCompile Include="src\bark\BarkStrip.cpp" />
     <ClCompile Include="src\bark\BarkTexGenerator.cpp" />
     <ClCompile Include="src\bark\Crust.cpp" />
     <ClCompile Include="src\bark\Fracture.cpp" />
+    <ClCompile Include="src\discreteSolver\DSCoherentTexture.cpp" />
+    <ClCompile Include="src\discreteSolver\DSIndexedTexture.cpp" />
+    <ClCompile Include="src\discreteSolver\DSPixelCoherence.cpp" />
     <ClCompile Include="src\discreteSolver\DSTexture.cpp" />
     <ClCompile Include="src\geometry\Bezierpath.cpp" />
     <ClCompile Include="src\geometry\Contour.cpp" />
@@ -143,7 +147,13 @@
     <ClInclude Include="include\bark\BarkStrip.h" />
     <ClInclude Include="include\bark\Crust.h" />
     <ClInclude Include="include\bark\Fracture.h" />
+    <ClInclude Include="include\discreteSolver\DSComparePixel.h" />
+    <ClInclude Include="include\discreteSolver\DSCoherentTexture.h" />
+    <ClInclude Include="include\discreteSolver\DSIndexedTexture.h" />
+    <ClInclude Include="include\discreteSolver\DSPixel.h" />
+    <ClInclude Include="include\discreteSolver\DSPixelCoherence.h" />
     <ClInclude Include="include\discreteSolver\DSTexture.h" />
+    <ClInclude Include="include\discreteSolver\DSTextureSynthesis.h" />
     <ClInclude Include="include\geometry\Bezierpath.h" />
     <ClInclude Include="include\geometry\Contour.h" />
     <ClInclude Include="include\geometry\cylinder.hpp" />

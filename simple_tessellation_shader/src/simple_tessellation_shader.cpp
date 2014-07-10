@@ -17,7 +17,7 @@
 #include "Image.h"
 #include "Object3D.h"
 #include "Scene3D.h"
-#include "DSTexture.h"
+#include "DSTextureSynthesis.h"
 
 #include <list>
 #include "BarkModule.h"
@@ -593,12 +593,16 @@ int main( int argc, char **argv)
 	
 	GeneralizedCylinder genCyl(path, contour, thickness, water, ages);
 	
-	Image* img = new Image("../data/textures/bark_young/bark_young_COLOR.jpg");
+	DSTextureSynthesis texSynth;
+	texSynth.loadImage("../data/textures/64.jpg");
+	texSynth.synthesize(nv::vec2i(64,64),5);
+
+	//Image* img = new Image("../data/textures/bark_young/bark_young_COLOR.jpg");
 	//img->scale(100,100);
 	//img->saveToFile(FIF_JPEG, "../data/textures/bark_young/copy.jpg");
-	DSTexture tex(img);
+	/*DSTexture tex(img);
 	tex.halfSize();
-	tex.saveToFile(FIF_JPEG, "../data/textures/bark_young/copy.jpg");
+	tex.saveToFile(FIF_JPEG, "../data/textures/bark_young/copy.jpg");*/
 
 	//Image img("../data/textures/bark_DISP.jpg");
 	
@@ -615,7 +619,7 @@ int main( int argc, char **argv)
 	//img.setTexBuffer(0);
 	//glBindTexture(GL_TEXTURE_2D, 0); //safety unbind
 	
-	Scene3D scene("../data/models/cylinder_round.obj");
+	//Scene3D scene("../data/models/cylinder_round.obj");
 
 	float angle = 0.0f;
 	while (running)

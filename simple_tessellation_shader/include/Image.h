@@ -9,6 +9,7 @@
 class Image {
 	public:
 		Image(const char*);
+		Image(Image const&);
 		~Image();
 		
 		unsigned int		getWidth()			const;
