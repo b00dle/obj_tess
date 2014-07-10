@@ -17,7 +17,7 @@ DSIndexedTexture::DSIndexedTexture(nv::vec2i const& dimensions):
 }
 
 DSIndexedTexture::DSIndexedTexture(Image* image):
-	DSTexture(image),
+	DSTexture(new Image(*image)),
 	_pixelLocations(),
 	_inputTexture(nullptr)
 {
@@ -45,7 +45,7 @@ DSIndexedTexture::DSIndexedTexture(DSIndexedTexture const& indexedTex):
 DSIndexedTexture::DSIndexedTexture(nv::vec2i const& startPoint, nv::vec2i const& dimensions, DSTexture const& input):
 	DSTexture(startPoint, dimensions, input),
 	_pixelLocations(),
-	_inputTexture(nullptr)
+	_inputTexture(new DSTexture(input))
 {
 	_pixelLocations.resize(_size.x);
 	for(unsigned int x = 0; x < _pixelLocations.size(); ++x){

@@ -67,8 +67,9 @@ void DSTextureSynthesis::synthesize(nv::vec2i const& size, int iterations) {
 	// create a random texture to iterate over
 	std::cout << "==========CREATING RANDOM TEXTURE========\n";
 	*_patchedTexture = createRandomTexture(*_patchedTexture, _patchListIndexed, numPatches);
+	_patchedTexture->saveToFile(FIF_JPEG, "../data/textures/random.jpg"); 
 	std::cout << "=======DONE=======\n";
-
+		
 	_synthesizedTextures.push_back(_patchedTexture);
 
 	nv::vec2i sizeScaledPatched(128,128);
@@ -86,6 +87,7 @@ void DSTextureSynthesis::synthesize(nv::vec2i const& size, int iterations) {
 	for(int i = 1; i < _originalTextures.size(); ++i) {
 		std::cout << "==discreet optimization (" << i << ") starting\n";
 		_patchedTexture->doubleSize(*_originalTextures[i]);
+		_patchedTexture->saveToFile(FIF_JPEG, "../data/textures/synth.jpg");
 		for(int s = _originalTextures[i]->getNeighbourSizes().size()-1; s >= 0; --s) {
 			std::cout << "s: " << s;
 			std::cout << " size: " << _originalTextures[i]->getNeighbourSize(s) << std::endl;
@@ -96,7 +98,7 @@ void DSTextureSynthesis::synthesize(nv::vec2i const& size, int iterations) {
 	}
 
 	std::cout << "=======DONE=======\n";
-	_patchedTexture->saveToFile(FIF_JPEG, "../data/textures/SYNTH.jpg");
+	_patchedTexture->saveToFile(FIF_JPEG, "../data/textures/synthdiscreet.jpg");
 }
 
 void DSTextureSynthesis::loadImage(std::string const& path) {
@@ -110,7 +112,7 @@ void DSTextureSynthesis::loadImage(std::string const& path) {
 	DSTexture first(_originalImage);
 	images.push_back(*_originalImage);
 
-	while(currentSize.x > 16 && currentSize.y > 16 ) {
+	while(currentSize.x > 40 && currentSize.y > 40 ) {
 		currentSize.x = ceil(currentSize.x / 2);
 		currentSize.y = ceil(currentSize.y / 2);
 		first.halfSize();

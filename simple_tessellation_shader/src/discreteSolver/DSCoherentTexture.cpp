@@ -1,5 +1,6 @@
 #include "DSCoherentTexture.h"
 #include <omp.h>
+#include <iostream>
 
 DSCoherentTexture::DSCoherentTexture():
 	DSTexture(),
@@ -60,6 +61,7 @@ DSCoherentTexture::DSCoherentTexture(Image* imageInput, DSCoherentTexture const&
 		_neighbourSizes.push_back(largest);
 	}
 
+	std::cout << "==DSCoherentTexture creating _pixelCoherences for size: (" << _size.x << "," << _size.y << ")\n";
 	#pragma omp parallel for num_threads(8)
 	for(unsigned int x = 0; x < _size.x; ++x) {
 		for(unsigned int y = 0; y < _size.y; ++y) {
@@ -74,6 +76,7 @@ DSCoherentTexture::DSCoherentTexture(Image* imageInput, DSCoherentTexture const&
 			_pixelCoherences[x][y] = new DSPixelCoherence(*this, *lowResTex._pixelCoherences[xHalf][yHalf], nv::vec2i(x,y), _neighbourSizes);
 		}
 	}
+	std::cout << "==DONE\n";
 }
 
 int DSCoherentTexture::getNeighbourSize(int i) const {

@@ -34,7 +34,7 @@ DSTexture::DSTexture(nv::vec2i dimensions):
 DSTexture::DSTexture(Image* imageInput):
 	_size(imageInput->getWidth(), imageInput->getHeight()),
 	_pixels(),
-	_image(imageInput)
+	_image(new Image(*imageInput))
 {
 	_pixels.resize(_size.x);
 	for(unsigned int column = 0; column < _size.x; ++column) {
@@ -47,7 +47,7 @@ DSTexture::DSTexture(Image* imageInput):
 DSTexture::DSTexture(nv::vec2i startPoint, nv::vec2i dimensions, DSTexture const& input):
 	_size(dimensions.x, dimensions.y),
 	_pixels(),
-	_image(nullptr)
+	_image(new Image(*input._image))
 {
     _pixels.resize(_size.x);
 	for(unsigned int column = 0; column < _size.x; ++column) {
@@ -124,7 +124,7 @@ void DSTexture::saveToFile(FREE_IMAGE_FORMAT format, const char* filepath) {
 }
 
 bool DSTexture::isInBounds(nv::vec2i const& point) const {
-	return point.x > 0 && point.y > 0 && point.x < _size.x && point.y < _size.y;  
+	return point.x >= 0 && point.y >= 0 && point.x < _size.x && point.y < _size.y;  
 }
 
 nv::vec2i const DSTexture::mirrorNotInBounds(nv::vec2i const& point) const {

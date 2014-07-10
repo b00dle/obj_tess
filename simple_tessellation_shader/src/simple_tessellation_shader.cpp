@@ -595,7 +595,7 @@ int main( int argc, char **argv)
 	
 	DSTextureSynthesis texSynth;
 	texSynth.loadImage("../data/textures/64.jpg");
-	texSynth.synthesize(nv::vec2i(64,64),5);
+	texSynth.synthesize(nv::vec2i(64,64),3);
 
 	//Image* img = new Image("../data/textures/bark_young/bark_young_COLOR.jpg");
 	//img->scale(100,100);
