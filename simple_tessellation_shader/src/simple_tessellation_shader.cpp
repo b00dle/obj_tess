@@ -24,6 +24,7 @@
 #include "Crust.h"
 #include "Fracture.h"
 #include "BarkStrip.h"
+#include "treeloader.h"
 
 //shaders
 unsigned sProgram;
@@ -57,6 +58,7 @@ unsigned texArrayLocation	= 0;
 
 // Flag to identify when the app needs to close
 bool running = true;
+bool tree = false;
 
 //widgets handle
 nv::SdkUIContext ui;
@@ -65,13 +67,13 @@ nv::SdkUIContext ui;
 GLuint ubo = 0;
 
 /*******************************************************************************
- *
- * Reflection of uniform buffer object
- *
- *  Special defines + including file shared with shaders to declare a struct
- * that maps the state directly
- *
- *******************************************************************************/
+*
+* Reflection of uniform buffer object
+*
+*  Special defines + including file shared with shaders to declare a struct
+* that maps the state directly
+*
+*******************************************************************************/
 
 //define to make sure the header understands the compilation mode
 #define CPP
@@ -83,14 +85,14 @@ GLuint ubo = 0;
 TessellationParams tessellationParameters;
 
 /*******************************************************************************
- *
- * Control variables
- *
- *  Variables used to bind control toggles and ranges to the sample
- *  Variables auto-register themselves with a singleton which handles the
- * routing of key presses.
- *
- *******************************************************************************/
+*
+* Control variables
+*
+*  Variables used to bind control toggles and ranges to the sample
+*  Variables auto-register themselves with a singleton which handles the
+* routing of key presses.
+*
+*******************************************************************************/
 nv::CVar<bool> lit( "lit", true, nv::KeyCode::Key_L, "Toggle lighting 'l'");
 nv::CVar<bool> lod( "lod", true, nv::KeyCode::Key_K, "Toggle lod mode 'k'");
 nv::CVar<bool> dMapping( "dMapping", true, nv::KeyCode::Key_D, "Toggle displacement mapping 'd'");
@@ -105,10 +107,10 @@ nv::CRefVar<float> df( tessellationParameters.df, "displacementFactor", 0.2f, 0.
 unsigned mode = 2;
 
 /*******************************************************************************
- *
- * Callback Functions
- *
- *******************************************************************************/
+*
+* Callback Functions
+*
+*******************************************************************************/
 
 //
 //  Function: key
@@ -120,19 +122,22 @@ void key( nv::KeyCode::KeyCode kc)
 {
 	switch (kc)
 	{
-		case nv::KeyCode::Key_Q:
-		case nv::KeyCode::Key_Escape:
-			running = false;
-			break;
-		case nv::KeyCode::Key_1:
-			mode = 1;			
-			break;
-		case nv::KeyCode::Key_2:
-			mode = 2;			
-			break;
-		case nv::KeyCode::Key_3:
-			mode = 3;			
-			break;
+	case nv::KeyCode::Key_Q:
+	case nv::KeyCode::Key_Escape:
+		running = false;
+		break;
+	case nv::KeyCode::Key_1:
+		mode = 1;			
+		break;
+	case nv::KeyCode::Key_2:
+		mode = 2;			
+		break;
+	case nv::KeyCode::Key_3:
+		mode = 3;			
+		break;
+	case nv::KeyCode::Key_0:
+		tree = !tree;			
+		break;
 	};
 
 	int x, y;
@@ -164,7 +169,7 @@ void generateUI(int width, int height) {
 
 	// Show the app title
 	ui.doLabel( nv::Rect(), "Simple Tessellation Shader", 1);
-		
+
 	// expose the variables
 	ui.doCVar( lit);
 	ui.doCVar( lod);
@@ -176,9 +181,9 @@ void generateUI(int width, int height) {
 	ui.doCVar( outerTess);
 	ui.doCVar( distance);
 	ui.doCVar( df);
-		
+
 	ui.endGroup();
-		
+
 	ui.end();
 }
 
@@ -187,7 +192,7 @@ void loadTexture(int tID, const char* filepath) {
 	FIBITMAP* _bitmap;
 
 	_bitmap = FreeImage_Load(FreeImage_GetFileType(filepath, 0),
-							 filepath);
+		filepath);
 
 	if(!_bitmap){
 		std::cout << "texture: \'" << filepath << "\' didn't load\n";
@@ -200,11 +205,11 @@ void loadTexture(int tID, const char* filepath) {
 
 	glBindTexture(GL_TEXTURE_2D, texBufferIds[tID]);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
-				FreeImage_GetWidth(_bitmap),
-				FreeImage_GetHeight(_bitmap),
-				0, GL_BGR, GL_UNSIGNED_BYTE,
-				pixelData
-	);
+		FreeImage_GetWidth(_bitmap),
+		FreeImage_GetHeight(_bitmap),
+		0, GL_BGR, GL_UNSIGNED_BYTE,
+		pixelData
+		);
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -224,7 +229,7 @@ void loadTexArray(int tID, std::vector<const char*> filepaths) {
 	FIBITMAP* _bitmap;
 
 	_bitmap = FreeImage_Load(FreeImage_GetFileType(filepaths[0], 0),
-							 filepaths[0]);
+		filepaths[0]);
 
 	glEnable(GL_TEXTURE_2D);
 
@@ -236,27 +241,27 @@ void loadTexArray(int tID, std::vector<const char*> filepaths) {
 	glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
 	glTexImage3D(GL_TEXTURE_2D_ARRAY,
-				 0, GL_RGB,
-				 FreeImage_GetWidth(_bitmap),
-				 FreeImage_GetHeight(_bitmap),
-				 filepaths.size(), //depth
-				 0, GL_RGB,
-				 GL_UNSIGNED_BYTE,
-				 NULL
-	);
-	
+		0, GL_RGB,
+		FreeImage_GetWidth(_bitmap),
+		FreeImage_GetHeight(_bitmap),
+		filepaths.size(), //depth
+		0, GL_RGB,
+		GL_UNSIGNED_BYTE,
+		NULL
+		);
+
 	for(int i = 0; i < filepaths.size(); ++i) {
 		_bitmap = FreeImage_Load(FreeImage_GetFileType(filepaths[i], 0), filepaths[i]);
 		unsigned char* pixelData = FreeImage_GetBits(_bitmap);
 
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
-						0, 0,
-						0, i,
-						FreeImage_GetWidth(_bitmap),
-						FreeImage_GetHeight(_bitmap),
-						1, GL_RGB, GL_UNSIGNED_BYTE,
-						pixelData
-		);
+			0, 0,
+			0, i,
+			FreeImage_GetWidth(_bitmap),
+			FreeImage_GetHeight(_bitmap),
+			1, GL_RGB, GL_UNSIGNED_BYTE,
+			pixelData
+			);
 	}
 }
 
@@ -336,10 +341,15 @@ void setUniformValues(int width, int height, float angle) {
 
 	//compute modelview matrix
 	nv::matrix4f translation, rotation;
-	nv::translation( translation, 0.0f, 0.0f, -distance);
+
+	if(!tree)
+		nv::translation( translation, 0.0f, 0.0f, -distance);
+	else
+		nv::translation( translation, 0.0f, -200.0f, -100*distance);
+
 	nv::rotationY( rotation, angle*2.0f*3.14159f / 360.0f );
 	nv::matrix4f modelviewMatrix = translation * rotation;
-		
+
 	// update struct representing UBO
 	tessellationParameters.ModelView			= modelviewMatrix;
 	tessellationParameters.ModelViewProjection	= projectionMatrix * modelviewMatrix;
@@ -352,20 +362,20 @@ void setUniformValues(int width, int height, float angle) {
 
 	// toggle mode dependent on keyboard input (keys: 1,2,3)
 	switch(mode){
-		case 1:
-			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE);
-			break;
-		case 2:
-			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL);
-			break;
-		case 3:
-			glPolygonMode( GL_FRONT_AND_BACK, GL_POINT);
-			break;
+	case 1:
+		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE);
+		break;
+	case 2:
+		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL);
+		break;
+	case 3:
+		glPolygonMode( GL_FRONT_AND_BACK, GL_POINT);
+		break;
 	};
-	
+
 	//bind shader program
 	glUseProgram(sProgram);
-	
+
 	//tranfer updated uniforms to gpu
 	glUniformMatrix4fv(MVPlocation, 1, GL_FALSE, tessellationParameters.ModelViewProjection.get_value());
 	glUniformMatrix4fv(MVlocation, 1, GL_FALSE, tessellationParameters.ModelView.get_value());
@@ -411,7 +421,7 @@ void setUniformValues(int width, int height, float angle) {
 	//glUniform1i(texHeightLocation, 0);
 
 	//nv framework binds at location 1, so textures are bound starting from location 2
-	
+
 	//young bark
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, texBufferIds[0]);
@@ -464,7 +474,7 @@ void init()
 		"ORANGE_PURPLE", "1",
 		NULL, NULL
 	};
-	
+
 	//register an include file that the shaders use to define a common uniform block
 	nv::RegisterShaderInclude( "uniforms.h");
 
@@ -492,17 +502,17 @@ void init()
 
 	//sets uniform locations for shader program (as specified in setUniformLocations() function)
 	setUniformLocations();
-	
+
 	GLenum err;
-    while ((err = glGetError()) != GL_NO_ERROR) {
-        std::cerr << "OpenGL error: " << err << std::endl;
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		std::cerr << "OpenGL error: " << err << std::endl;
 		exit(-2);
-    }
+	}
 }
 
 int main( int argc, char **argv)
 {
-	
+
 	//system("PAUSE");
 
 	// Initialize window system portion of library (potenially refactor to have library-wide init?)
@@ -523,7 +533,7 @@ int main( int argc, char **argv)
 
 	if (!glewIsSupported("GL_VERSION_4_2"))
 	{
-        printf("Sample requires 4.2\n");
+		printf("Sample requires 4.2\n");
 		return -1; 
 	}
 
@@ -546,67 +556,255 @@ int main( int argc, char **argv)
 	printf("Max supported patch vertices %d\n", MaxPatchVertices);
 
 	//////GENERALIZED CYLINDER//////
-	
+
 	//path
-	nv::matrix4f p0, p1;
-	p0.make_identity();
-	p1.make_identity();
-	p0.set_translate(nv::vec3f(0.0f,-1.0f,0.0f));
-	p1.set_translate(nv::vec3f(0.0f,1.0f,0.0f));
-	
-	Path path(p0);
-	path.addSegment(p1);
-	path.calculate();
-	
+	nv::matrix4f p0fat, p1fat;
+	p0fat.make_identity();
+	p1fat.make_identity();
+	p0fat.set_translate(nv::vec3f(0.0f,-1.0f,0.0f));
+	p1fat.set_translate(nv::vec3f(0.0f,1.0f,0.0f));
+
+	Path pathfat(p0fat);
+	pathfat.addSegment(p1fat);
+	pathfat.calculate();
+
 	//contour
-	std::vector<nv::vec4f> temp;
-	temp.push_back(nv::vec4f(0,		0,		1,		1));
-	temp.push_back(nv::vec4f(-1,	0,		0.5,	1));
-	temp.push_back(nv::vec4f(-1,	0,		-0.5,	1));
-	temp.push_back(nv::vec4f(0,		0,		-1,		1));
-	temp.push_back(nv::vec4f(1,		0,		-0.5,	1));
-	temp.push_back(nv::vec4f(1,		0,		0.5,	1));
+	std::vector<nv::vec4f> tempfat;
+	tempfat.push_back(nv::vec4f(0,		0,		1,		1));
+	tempfat.push_back(nv::vec4f(-1,	0,		0.5,	1));
+	tempfat.push_back(nv::vec4f(-1,	0,		-0.5,	1));
+	tempfat.push_back(nv::vec4f(0,		0,		-1,		1));
+	tempfat.push_back(nv::vec4f(1,		0,		-0.5,	1));
+	tempfat.push_back(nv::vec4f(1,		0,		0.5,	1));
 
 	//Contour contour(temp);
-	Contour contour;
+	Contour contourfat;
 
 	//thickness
-	std::vector<float> thickness;
-	thickness.push_back(0.6f);
-	thickness.push_back(0.3f);
-	
-	//water
-	std::vector<float> water;
-	water.push_back(1.0f);
-	water.push_back(1.0f);
+	std::vector<float> thicknessfat;
+	thicknessfat.push_back(0.6f);
+	thicknessfat.push_back(0.3f);
 
 	//water
-	std::vector<float> ages;
-	ages.push_back(1.0f);
-	ages.push_back(0.0f);
+	std::vector<float> waterfat;
+	waterfat.push_back(1.0f);
+	waterfat.push_back(1.0f);
+
+	//water
+	std::vector<float> agesfat;
+	agesfat.push_back(1.0f);
+	agesfat.push_back(0.0f);
 
 	///////////////////////////////
 
 	Icosahedron ico;
 	Cylinder cyl;
-	GeneralizedCylinder genCyl(path, contour, thickness, water, ages);
-	
+	GeneralizedCylinder genCylfat(pathfat, contourfat, thicknessfat, waterfat, agesfat);
+	TreeLoader tree;
+	tree.readTreeDescr();
+	GeneralizedCylinder genCyl = tree.getTreeDescr();
 	//Image img("../data/textures/bark_DISP.jpg");
-	
+
 	/*unsigned int width = img.getWidth();
 	unsigned int height = img.getHeight();
 	nv::vec3f add(0.8,0.2,0.1);
 	for(unsigned int x = 0; x < 649; ++x){
-		for(unsigned int y = 0; y < 649; ++y){
-			img.setPixel(x, y, 0.5*img.getPixel(x,y) + 0.5*add);
-		}
+	for(unsigned int y = 0; y < 649; ++y){
+	img.setPixel(x, y, 0.5*img.getPixel(x,y) + 0.5*add);
+	}
 	}
 	*/
 
 	//img.setTexBuffer(0);
 	//glBindTexture(GL_TEXTURE_2D, 0); //safety unbind
-	
-	Scene3D scene("../data/models/cylinder_round.obj");
+
+	//////GENERALIZED CYLINDERS//////
+	//water
+	std::vector<float> water;
+	water.push_back(0.0f);
+	water.push_back(0.0f);
+	water.push_back(0.0f);
+	water.push_back(0.0f);
+	water.push_back(0.0f);
+	water.push_back(0.0f);
+	water.push_back(0.0f);
+	water.push_back(0.0f);
+	water.push_back(0.0f);
+	water.push_back(0.0f);
+	water.push_back(0.0f);
+	water.push_back(0.0f);
+	water.push_back(0.0f);
+
+	std::vector<float> ages;
+	ages.push_back(1.0f);
+	ages.push_back(1.0f);
+	ages.push_back(1.0f);
+	ages.push_back(1.0f);
+	ages.push_back(1.0f);
+	ages.push_back(1.0f);
+	ages.push_back(1.0f);
+	ages.push_back(1.0f);
+	ages.push_back(1.0f);
+	ages.push_back(1.0f);
+	ages.push_back(1.0f);
+	ages.push_back(1.0f);
+
+	//Contour
+	Contour contour;
+
+	////Cyl1////
+
+	//path
+	nv::matrix4f p0(1.0,0.0,0.0,0.0,
+		0.0,1.0,0.0,0.0,
+		0.0,0.0,1.0,0.0,
+		0.0,0.0,0.0,1.0);
+
+	nv::matrix4f p1(1.0,0.0,0.0,0.0,
+		0.0,1.0,0.0,0.0,
+		0.0,0.0,1.0,0.0,
+		0.0,40.0,0.0,1.0);
+
+	nv::matrix4f p2(0.994525, 0, 0.104497, 0.0,
+		-0.000863566, 0.999966, 0.00822915, 0.0,
+		-0.104493, -0.0082743, 0.994491, 0.0,
+		-0.0345426, 79.9986, 0.329166, 1.0 );
+
+	nv::matrix4f p3(0.906395, -0.00268308, 0.422423, 0.0,
+		0.000382466, 0.999985, 0.00553374, 0.0,
+		-0.422431, -0.00485406, 0.906382, 0.0,
+		-0.019244, 119.998, 0.550515, 1.0);
+
+	nv::matrix4f p4(0.848118, -0.00325082, 0.529797, 0.0,
+		-0.00247136, 0.999946, 0.0100939, 0.0,
+		-0.529801, -0.00986999, 0.848064, 0.0,
+		-0.118099, 159.996, 0.954269, 1.0 );
+
+	nv::matrix4f p5(0.940036, -0.00113117, 0.341073, 0.0,
+		-0.00435189, 0.999873, 0.0153166, 0.0,
+		-0.341047, -0.0158825, 0.939912, 0.0,
+		-0.292174, 199.991, 1.56693 ,1.0 );
+
+	nv::matrix4f p6(0.913964, -0.0022373, 0.40579, 0.0,
+		-0.00479406, 0.999855, 0.0163154, 0.0,
+		-0.405768, -0.0168571, 0.913821, 0.0,
+		-0.483937, 239.985, 2.21955, 1.0);
+
+	nv::matrix4f p7(0.545421, -0.0110606, 0.838089, 0.0,
+		-0.00811369, 0.999796, 0.0184784, 0.0,
+		-0.838123, -0.0168783, 0.545221, 0.0,
+		-0.808484, 279.977, 2.95868, 1.0 );
+
+	nv::matrix4f p8(0.829132, -0.00358517, 0.559042, 0.0,
+		-0.00225985, 0.99995, 0.00976967, 0,
+		-0.559049, -0.00936349, 0.829082, 0.0,
+		-0.898878, 319.975, 3.34947, 1.0 );
+
+	nv::matrix4f p9(0.848101, -0.00325601, 0.529825, 0.0,
+		-0.0066194, 0.999838, 0.0167456, 0.0,
+		-0.529794, -0.0177089, 0.847942, 0.0,
+		-1.16365, 359.968, 4.0193 ,1.0 );
+
+	nv::matrix4f p10(0.720049, -0.00687099, 0.693889, 0.0,
+		-0.00256533, 0.999918, 0.012566, 0.0,
+		-0.693918, -0.0108281, 0.719972, 0.0,
+		-1.26627, 399.965, 4.52194, 1.0);
+
+	nv::matrix4f p11(0.424112, -0.0102914, 0.905552, 0.0,
+		-0.0107291, 0.999808, 0.0163875, 0.0,
+		-0.905546, -0.0166661, 0.42392, 0.0,
+		-1.69543, 439.957, 5.17744, 1.0 );
+
+	Path path(p0);
+	path.addSegment(p1);
+	path.addSegment(p2);
+	path.addSegment(p3);
+	path.addSegment(p4);
+	path.addSegment(p5);
+	path.addSegment(p6);
+	path.addSegment(p7);
+	path.addSegment(p8);
+	path.addSegment(p9);
+	path.addSegment(p10);
+	path.addSegment(p11);
+	path.calculate();
+
+	//thickness
+	std::vector<float> thickness;
+	thickness.push_back(10.817);
+	thickness.push_back(7.657);
+	thickness.push_back(7.27);
+	thickness.push_back(6.941);
+	thickness.push_back(6.515);
+	thickness.push_back(6.063);
+	thickness.push_back(5.577);
+	thickness.push_back(5.03);
+	thickness.push_back(4.38);
+	thickness.push_back(3.673); 
+	thickness.push_back(2.74);
+	thickness.push_back(0);
+
+	////Cyl2//////////////////////
+	//PATH//
+	nv::matrix4f p12(0.848101, -0.00325601, 0.529825, 0.0,
+		-0.0066194, 0.999838, 0.0167456, 0.0,
+		-0.529794, -0.0177089, 0.847942, 0.0,
+		-1.16365, 359.968, 4.0193, 1.0 );
+
+	nv::matrix4f p13(0.720049, -0.00687099, 0.693889, 0.0,
+		-0.00256533, 0.999918, 0.012566, 0.0,
+		-0.693918, -0.0108281, 0.719972, 0.0,
+		-1.26627, 399.965, 4.52194, 1.0);
+
+	nv::matrix4f p14(0.970044, 0.00554262, -0.242866, 0.0,
+		0.184436, 0.633874, 0.751124, 0.0,
+		0.15811, -0.773416, 0.613864, 0.0,
+		6.11118, 425.32, 34.5669, 1.0 );
+
+	Path path1(p12);
+	path1.addSegment(p13);
+	path1.addSegment(p14);
+	path1.calculate();
+
+	//thickness///
+	std::vector<float> thickness1;
+	thickness1.push_back(2.74);
+	thickness1.push_back(2.74);
+	thickness1.push_back(0);
+
+	////Cyl3////
+	//PATH///
+	nv::matrix4f p15(0.970044, 0.00554262, -0.242866, 0.0,
+		0.184436, 0.633874, 0.751124, 0.0,
+		0.15811, -0.773416, 0.613864, 0.0,
+		6.11118, 425.32, 34.5669, 1.0 );    
+	nv::matrix4f p16(0.970044, 0.00554262, -0.242866, 0.0,
+		0.184436, 0.633874, 0.751124, 0.0,
+		0.15811, -0.773416, 0.613864, 0.0,
+		6.11118, 425.32, 34.5669, 1.0 );    
+	nv::matrix4f p17(0.515915, -0.00943932, 0.856588, 0.0,
+		0.654573, 0.649384, -0.387085, 0.0,
+		-0.552601, 0.760402, 0.341206, 0.0,
+		24.9166, 425.94 ,-10.9615, 1.0 );
+
+	Path path2(p15);
+	path2.addSegment(p16);
+	path2.addSegment(p17);
+	path2.calculate();
+
+	//thickness///
+	std::vector<float> thickness2;
+	thickness2.push_back(2.74);
+	thickness2.push_back(2.74);
+	thickness2.push_back(0);
+
+	///////////////////////////
+	GeneralizedCylinder genCyl(path, contour, thickness, water, ages);
+	GeneralizedCylinder genCyl1(path1, contour, thickness1, water, ages);
+	GeneralizedCylinder genCyl2(path2, contour, thickness2, water, ages);
+
+
+	//Scene3D scene("../data/models/cylinder_round.obj");
 
 	float angle = 0.0f;
 	while (running)
@@ -631,10 +829,21 @@ int main( int argc, char **argv)
 		glPointSize(4);
 
 		glPatchParameteri(GL_PATCH_VERTICES, 3);
-		glBindVertexArray(genCyl.getVAO());
-		
-		glDrawElements(GL_PATCHES, genCyl.getIndexCount(), GL_UNSIGNED_INT, 0);
 
+		if(!tree) {
+			glBindVertexArray(genCylfat.getVAO());
+			glDrawElements(GL_PATCHES, genCylfat.getIndexCount(), GL_UNSIGNED_INT, 0);
+		}
+		else {
+			glBindVertexArray(genCyl.getVAO());
+			glDrawElements(GL_PATCHES, genCyl.getIndexCount(), GL_UNSIGNED_INT, 0);
+
+			glBindVertexArray(genCyl1.getVAO());
+			glDrawElements(GL_PATCHES, genCyl1.getIndexCount(), GL_UNSIGNED_INT, 0);
+
+			glBindVertexArray(genCyl2.getVAO());
+			glDrawElements(GL_PATCHES, genCyl2.getIndexCount(), GL_UNSIGNED_INT, 0);
+		}
 		//unbind everything
 		glBindTexture(GL_TEXTURE_2D, 0);
 		glBindVertexArray(0);
