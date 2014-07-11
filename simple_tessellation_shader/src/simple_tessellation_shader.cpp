@@ -24,7 +24,6 @@
 #include "Crust.h"
 #include "Fracture.h"
 #include "BarkStrip.h"
-#include "treeloader.h"
 
 //shaders
 unsigned sProgram;
@@ -600,9 +599,6 @@ int main( int argc, char **argv)
 	Icosahedron ico;
 	Cylinder cyl;
 	GeneralizedCylinder genCylfat(pathfat, contourfat, thicknessfat, waterfat, agesfat);
-	TreeLoader tree;
-	tree.readTreeDescr();
-	GeneralizedCylinder genCyl = tree.getTreeDescr();
 	//Image img("../data/textures/bark_DISP.jpg");
 
 	/*unsigned int width = img.getWidth();
