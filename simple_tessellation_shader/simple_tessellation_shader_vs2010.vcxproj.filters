@@ -98,6 +98,9 @@
     <ClCompile Include="src\geometry\Scene3D.cpp">
       <Filter>Source Files\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="src\treeloader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\objFormatter.hpp">
@@ -156,6 +159,9 @@
     </ClInclude>
     <ClInclude Include="include\geometry\Scene3D.h">
       <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\treeloader.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

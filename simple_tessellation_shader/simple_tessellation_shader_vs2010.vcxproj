@@ -134,6 +134,7 @@
     <ClCompile Include="src\objFormatter.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\simple_tessellation_shader.cpp" />
+    <ClCompile Include="src\treeloader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BarkTexGenerator.h" />
@@ -154,6 +155,7 @@
     <ClInclude Include="include\Mathlib.h" />
     <ClInclude Include="include\objFormatter.hpp" />
     <ClInclude Include="include\Shader.h" />
+    <ClInclude Include="include\treeloader.h" />
     <ClInclude Include="include\uniforms.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

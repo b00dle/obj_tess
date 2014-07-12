@@ -24,11 +24,12 @@
 #include "Crust.h"
 #include "Fracture.h"
 #include "BarkStrip.h"
+#include "treeloader.h"
 
 //shaders
 unsigned sProgram;
 unsigned shaderIds[5] = { 0u };
-unsigned texBufferIds[12] = { 0u };
+unsigned texBufferIds[18] = { 0u };
 
 //uniform locations
 unsigned MVPlocation		= 0;
@@ -57,7 +58,9 @@ unsigned texArrayLocation	= 0;
 
 // Flag to identify when the app needs to close
 bool running = true;
-bool tree = false;
+bool useTreeModel = false;
+bool rotate = true;
+bool useStandardTexture = true;
 
 //widgets handle
 nv::SdkUIContext ui;
@@ -101,7 +104,7 @@ nv::CVar<bool> triangles( "triangles", false, nv::KeyCode::Key_P, "Toggle triang
 nv::CRefVar<float> innerTess( tessellationParameters.innerTessFactor, "InnerTessFactor", 1.0f, 1.0f, 64.0f, nv::KeyCode::Key_I, "Change tesselation factor");
 nv::CRefVar<float> outerTess( tessellationParameters.outerTessFactor, "OuterTessFactor", 1.0f, 1.0f, 64.0f, nv::KeyCode::Key_O, "Change tesselation factor");
 nv::CRefVar<float> distance( tessellationParameters.distance, "distance", 1.0f, 1.0f, 64.0f, nv::KeyCode::Key_P, "Change distance");
-nv::CRefVar<float> df( tessellationParameters.df, "displacementFactor", 0.2f, 0.0f, 1.0f, nv::KeyCode::Key_P, "Change displacement Factor");
+nv::CRefVar<float> df( tessellationParameters.df, "displacementFactor", 0.2f, 0.0f, 2.0f, nv::KeyCode::Key_P, "Change displacement Factor");
 
 unsigned mode = 2;
 
@@ -135,7 +138,13 @@ void key( nv::KeyCode::KeyCode kc)
 		mode = 3;			
 		break;
 	case nv::KeyCode::Key_0:
-		tree = !tree;			
+		useTreeModel = !useTreeModel;			
+		break;
+	case nv::KeyCode::Key_R:
+		rotate = !rotate;			
+		break;
+	case nv::KeyCode::Key_9:
+		useStandardTexture = !useStandardTexture;			
 		break;
 	};
 
@@ -265,8 +274,9 @@ void loadTexArray(int tID, std::vector<const char*> filepaths) {
 }
 
 void generateTextures() {
-	glGenTextures(9, texBufferIds);
+	glGenTextures(18, texBufferIds);
 
+	/////////STANDARD BARK////////////
 	//young bark
 	glEnable(GL_TEXTURE_2D);
 	loadTexture(0,"../data/textures/bark_young/bark_young_COLOR.jpg");
@@ -297,12 +307,43 @@ void generateTextures() {
 	glEnable(GL_TEXTURE_2D);
 	loadTexture(8,"../data/textures/bark_old/bark_old_NRM.jpg");
 
+	/////////PALM TREE BARK////////////
+	//young bark
+	glEnable(GL_TEXTURE_2D);
+	loadTexture(9,"../data/textures/bark_palm_young/palm_young_COLOR.jpg");
+
+	glEnable(GL_TEXTURE_2D);
+	loadTexture(10,"../data/textures/bark_palm_young/palm_young_DISP.jpg");
+
+	glEnable(GL_TEXTURE_2D);
+	loadTexture(11,"../data/textures/bark_palm_young/palm_young_NRM.jpg");
+
+	//middle old bark
+	glEnable(GL_TEXTURE_2D);
+	loadTexture(12,"../data/textures/bark_palm_mid/palm_mid_COLOR.jpg");
+
+	glEnable(GL_TEXTURE_2D);
+	loadTexture(13,"../data/textures/bark_palm_mid/palm_mid_DISP.jpg");
+
+	glEnable(GL_TEXTURE_2D);
+	loadTexture(14,"../data/textures/bark_palm_mid/palm_mid_NRM.jpg");
+
+	//old bark
+	glEnable(GL_TEXTURE_2D);
+	loadTexture(15,"../data/textures/bark_palm_old/palm_old_COLOR.jpg");
+
+	glEnable(GL_TEXTURE_2D);
+	loadTexture(16,"../data/textures/bark_palm_old/palm_old_DISP.jpg");
+
+	glEnable(GL_TEXTURE_2D);
+	loadTexture(17,"../data/textures/bark_palm_old/palm_old_NRM.jpg");
+	/*
 	std::vector<const char*> filepaths;
 	filepaths.push_back("../data/textures/bark_old/bark_old_COLOR.jpg");
 	filepaths.push_back("../data/textures/bark_old/bark_old_DISP.jpg");
 	filepaths.push_back("../data/textures/bark_old/bark_old_NRM.jpg");
 	loadTexArray(9, filepaths);
-
+	*/
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -330,7 +371,7 @@ void setUniformLocations() {
 	texDiffuseLocationO = glGetUniformLocation(sProgram, "texColorOld");
 	texHeightLocationO	= glGetUniformLocation(sProgram, "texHeightOld");
 	texNormalLocationO	= glGetUniformLocation(sProgram, "texNormalOld");
-	texArrayLocation	= glGetUniformLocation(sProgram, "texArray");
+	//texArrayLocation	= glGetUniformLocation(sProgram, "texArray");
 }
 
 void setUniformValues(int width, int height, float angle) {
@@ -341,10 +382,10 @@ void setUniformValues(int width, int height, float angle) {
 	//compute modelview matrix
 	nv::matrix4f translation, rotation;
 
-	if(!tree)
+	if(!useTreeModel)
 		nv::translation( translation, 0.0f, 0.0f, -distance);
 	else
-		nv::translation( translation, 0.0f, -200.0f, -100*distance);
+		nv::translation( translation, 0.0f, -270.0f, -15*distance);
 
 	nv::rotationY( rotation, angle*2.0f*3.14159f / 360.0f );
 	nv::matrix4f modelviewMatrix = translation * rotation;
@@ -420,49 +461,89 @@ void setUniformValues(int width, int height, float angle) {
 	//glUniform1i(texHeightLocation, 0);
 
 	//nv framework binds at location 1, so textures are bound starting from location 2
+	if(useStandardTexture) {
+		//young bark
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, texBufferIds[0]);
+		glUniform1i(texDiffuseLocationY, 2);
 
-	//young bark
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, texBufferIds[0]);
-	glUniform1i(texDiffuseLocationY, 2);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, texBufferIds[1]);
+		glUniform1i(texHeightLocationY, 3);
 
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, texBufferIds[1]);
-	glUniform1i(texHeightLocationY, 3);
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, texBufferIds[2]);
+		glUniform1i(texNormalLocationY, 4);
 
-	glActiveTexture(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, texBufferIds[2]);
-	glUniform1i(texNormalLocationY, 4);
+		//mid old bark
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, texBufferIds[3]);
+		glUniform1i(texDiffuseLocationM, 5);
 
-	//mid old bark
-	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_2D, texBufferIds[3]);
-	glUniform1i(texDiffuseLocationM, 5);
+		glActiveTexture(GL_TEXTURE6);
+		glBindTexture(GL_TEXTURE_2D, texBufferIds[4]);
+		glUniform1i(texHeightLocationM, 6);
 
-	glActiveTexture(GL_TEXTURE6);
-	glBindTexture(GL_TEXTURE_2D, texBufferIds[4]);
-	glUniform1i(texHeightLocationM, 6);
+		glActiveTexture(GL_TEXTURE7);
+		glBindTexture(GL_TEXTURE_2D, texBufferIds[5]);
+		glUniform1i(texNormalLocationM, 7);
 
-	glActiveTexture(GL_TEXTURE7);
-	glBindTexture(GL_TEXTURE_2D, texBufferIds[5]);
-	glUniform1i(texNormalLocationM, 7);
+		//old bark
+		glActiveTexture(GL_TEXTURE8);
+		glBindTexture(GL_TEXTURE_2D, texBufferIds[6]);
+		glUniform1i(texDiffuseLocationO, 8);
 
-	//old bark
-	glActiveTexture(GL_TEXTURE8);
-	glBindTexture(GL_TEXTURE_2D, texBufferIds[6]);
-	glUniform1i(texDiffuseLocationO, 8);
+		glActiveTexture(GL_TEXTURE9);
+		glBindTexture(GL_TEXTURE_2D, texBufferIds[7]);
+		glUniform1i(texHeightLocationO, 9);
 
-	glActiveTexture(GL_TEXTURE9);
-	glBindTexture(GL_TEXTURE_2D, texBufferIds[7]);
-	glUniform1i(texHeightLocationO, 9);
+		glActiveTexture(GL_TEXTURE10);
+		glBindTexture(GL_TEXTURE_2D, texBufferIds[8]);
+		glUniform1i(texNormalLocationO, 10);
+	}
+	else {
+		//young bark
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, texBufferIds[9]);
+		glUniform1i(texDiffuseLocationY, 2);
 
-	glActiveTexture(GL_TEXTURE10);
-	glBindTexture(GL_TEXTURE_2D, texBufferIds[8]);
-	glUniform1i(texNormalLocationO, 10);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, texBufferIds[10]);
+		glUniform1i(texHeightLocationY, 3);
 
-	glActiveTexture(GL_TEXTURE11);
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, texBufferIds[11]);
+		glUniform1i(texNormalLocationY, 4);
+
+		//mid old bark
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, texBufferIds[12]);
+		glUniform1i(texDiffuseLocationM, 5);
+
+		glActiveTexture(GL_TEXTURE6);
+		glBindTexture(GL_TEXTURE_2D, texBufferIds[13]);
+		glUniform1i(texHeightLocationM, 6);
+
+		glActiveTexture(GL_TEXTURE7);
+		glBindTexture(GL_TEXTURE_2D, texBufferIds[14]);
+		glUniform1i(texNormalLocationM, 7);
+
+		//old bark
+		glActiveTexture(GL_TEXTURE8);
+		glBindTexture(GL_TEXTURE_2D, texBufferIds[15]);
+		glUniform1i(texDiffuseLocationO, 8);
+
+		glActiveTexture(GL_TEXTURE9);
+		glBindTexture(GL_TEXTURE_2D, texBufferIds[16]);
+		glUniform1i(texHeightLocationO, 9);
+
+		glActiveTexture(GL_TEXTURE10);
+		glBindTexture(GL_TEXTURE_2D, texBufferIds[17]);
+		glUniform1i(texNormalLocationO, 10);
+	}
+	/*glActiveTexture(GL_TEXTURE11);
 	glBindTexture(GL_TEXTURE_2D, texBufferIds[9]);
-	glUniform1i(texArrayLocation, 11);
+	glUniform1i(texArrayLocation, 11);*/
 }
 
 void init()
@@ -595,6 +676,9 @@ int main( int argc, char **argv)
 	agesfat.push_back(0.0f);
 
 	///////////////////////////////
+	TreeLoader tree;
+	tree.readTreeDescr();
+	GeneralizedCylinder genTree = tree.getTreeDescr();
 
 	Icosahedron ico;
 	Cylinder cyl;
@@ -817,28 +901,24 @@ int main( int argc, char **argv)
 
 		setUniformValues(width, height, angle);
 
-		angle += 0.5f;
-		if (angle >= 360.0f)
-			angle -= 360.0f;
+		if(rotate) {
+			angle += 0.5f;
+			if (angle >= 360.0f)
+				angle -= 360.0f;
+		}
 
 		glEnable(GL_PROGRAM_POINT_SIZE_EXT);
 		glPointSize(4);
 
 		glPatchParameteri(GL_PATCH_VERTICES, 3);
 
-		if(!tree) {
+		if(!useTreeModel) {
 			glBindVertexArray(genCylfat.getVAO());
 			glDrawElements(GL_PATCHES, genCylfat.getIndexCount(), GL_UNSIGNED_INT, 0);
 		}
 		else {
-			glBindVertexArray(genCyl.getVAO());
-			glDrawElements(GL_PATCHES, genCyl.getIndexCount(), GL_UNSIGNED_INT, 0);
-
-			glBindVertexArray(genCyl1.getVAO());
-			glDrawElements(GL_PATCHES, genCyl1.getIndexCount(), GL_UNSIGNED_INT, 0);
-
-			glBindVertexArray(genCyl2.getVAO());
-			glDrawElements(GL_PATCHES, genCyl2.getIndexCount(), GL_UNSIGNED_INT, 0);
+			glBindVertexArray(genTree.getVAO());
+			glDrawElements(GL_PATCHES, genTree.getIndexCount(), GL_UNSIGNED_INT, 0);
 		}
 		//unbind everything
 		glBindTexture(GL_TEXTURE_2D, 0);
