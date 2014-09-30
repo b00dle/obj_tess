@@ -663,7 +663,7 @@ int main( int argc, char **argv)
 	//thickness
 	std::vector<float> thicknessfat;
 	thicknessfat.push_back(0.6f);
-	thicknessfat.push_back(0.3f);
+	thicknessfat.push_back(0.6f); // 0.3
 
 	//water
 	std::vector<float> waterfat;
@@ -672,8 +672,8 @@ int main( int argc, char **argv)
 
 	//water
 	std::vector<float> agesfat;
-	agesfat.push_back(1.0f);
-	agesfat.push_back(0.0f);
+	agesfat.push_back(1.25f);
+	agesfat.push_back(0.0f); //0.0
 
 	///////////////////////////////
 	TreeLoader tree;
@@ -894,7 +894,7 @@ int main( int argc, char **argv)
 		nv::GetWindowSize( width, height);
 
 		// clear color, dpeth, and stencil, because the UI code relies on stencil
-		glClearColor( 0.7, 0.7, 0.7, 1.0);
+		glClearColor( 1.0, 1.0, 1.0, 1.0);
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glEnable(GL_DEPTH_TEST);
